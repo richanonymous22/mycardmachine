@@ -1,5 +1,8 @@
 import { motion } from "framer-motion";
 import { Star, TrendingUp, Users, Award, Quote } from "lucide-react";
+import sarahMitchell from "@/assets/testimonials/sarah-mitchell.jpg";
+import jamesPatterson from "@/assets/testimonials/james-patterson.jpg";
+import emmaThompson from "@/assets/testimonials/emma-thompson.jpg";
 
 const stats = [
   {
@@ -38,31 +41,29 @@ const testimonials = [
     role: "Coffee Shop Owner",
     content: "Switched from my old provider and I'm saving £180 per month! The process was seamless and the My Card Machine team handled everything.",
     rating: 5,
-    avatar: "SM",
+    image: sarahMitchell,
   },
   {
     name: "James Patterson",
     role: "Restaurant Manager",
     content: "I had no idea I was overpaying until I used this tool. Now I'm saving over £2,000 annually. Absolutely brilliant service!",
     rating: 5,
-    avatar: "JP",
+    image: jamesPatterson,
   },
   {
     name: "Emma Thompson",
     role: "Retail Store Owner",
     content: "The comparison was eye-opening. I switched providers in less than a week and the savings are already adding up. Highly recommend!",
     rating: 5,
-    avatar: "ET",
+    image: emmaThompson,
   },
 ];
 
 export const SocialProof = () => {
   return (
-    <section className="py-16 md:py-24 relative overflow-hidden bg-gradient-to-b from-transparent via-muted/30 to-transparent">
-      {/* Background Effects */}
+    <section className="py-12 md:py-20 relative overflow-hidden">
+      {/* Subtle Grid Pattern */}
       <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:30px_30px]" />
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent/10 rounded-full blur-3xl" />
 
       <div className="container mx-auto px-4 relative z-10">
         {/* Section Header */}
@@ -150,9 +151,11 @@ export const SocialProof = () => {
 
               {/* Author */}
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-gradient-primary flex items-center justify-center text-primary-foreground font-bold shadow-glow">
-                  {testimonial.avatar}
-                </div>
+                <img 
+                  src={testimonial.image} 
+                  alt={testimonial.name}
+                  className="w-12 h-12 rounded-full object-cover ring-2 ring-primary/20"
+                />
                 <div>
                   <div className="font-semibold text-foreground">
                     {testimonial.name}

@@ -1,41 +1,13 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { TrendingUp, Sparkles, ArrowRight } from "lucide-react";
+import { TrendingUp, ArrowRight, CheckCircle2 } from "lucide-react";
 
 export const HeroV2 = () => {
   return (
-    <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden pt-20 pb-12">
-      {/* Animated Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-background via-primary/10 to-accent/5" />
+    <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden pt-24 pb-16">
+      {/* Subtle Grid Pattern */}
       <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:50px_50px]" />
       
-      {/* Animated Orbs */}
-      <motion.div
-        animate={{
-          scale: [1, 1.2, 1],
-          opacity: [0.3, 0.5, 0.3],
-        }}
-        transition={{
-          duration: 8,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-        className="absolute top-20 right-20 w-96 h-96 bg-primary/20 rounded-full blur-3xl"
-      />
-      <motion.div
-        animate={{
-          scale: [1, 1.3, 1],
-          opacity: [0.3, 0.5, 0.3],
-        }}
-        transition={{
-          duration: 10,
-          repeat: Infinity,
-          ease: "easeInOut",
-          delay: 1,
-        }}
-        className="absolute bottom-20 left-20 w-96 h-96 bg-accent/20 rounded-full blur-3xl"
-      />
-
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-5xl mx-auto text-center">
           {/* Badge */}
@@ -43,10 +15,10 @@ export const HeroV2 = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-8"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-primary/20 mb-6 md:mb-8"
           >
-            <Sparkles className="w-4 h-4 text-primary" />
-            <span className="text-sm font-semibold text-primary">
+            <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+            <span className="text-sm font-semibold text-foreground">
               UK's #1 Card Machine Comparison Platform
             </span>
           </motion.div>
@@ -56,17 +28,12 @@ export const HeroV2 = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-4xl md:text-6xl lg:text-7xl font-bold text-foreground mb-6 leading-tight"
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-foreground mb-4 md:mb-6 leading-tight"
           >
-            Find Your Perfect{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-primary">
-              Card Machine
+            Save Money on{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-primary to-accent">
+              Card Payments
             </span>
-            <br />
-            <span className="text-transparent bg-clip-text bg-gradient-accent">
-              Save Thousands
-            </span>{" "}
-            Every Year
           </motion.h1>
 
           {/* Subheading */}
@@ -74,81 +41,81 @@ export const HeroV2 = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-lg md:text-xl text-muted-foreground mb-8 max-w-3xl mx-auto leading-relaxed"
+            className="text-base sm:text-lg md:text-xl text-muted-foreground mb-6 md:mb-8 max-w-3xl mx-auto leading-relaxed px-4"
           >
-            Compare rates from leading UK payment providers instantly. Enter your monthly turnover
-            below to discover how much you could save with My Card Machine.
+            Compare rates from UK's leading payment providers in seconds. 
+            Most businesses save <span className="text-foreground font-semibold">£2,000+ per year</span>.
           </motion.p>
 
-          {/* Stats Bar */}
+          {/* Trust Indicators - Mobile Optimized */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="flex flex-wrap justify-center gap-8 mb-12"
+            className="flex flex-wrap justify-center gap-3 md:gap-6 mb-8 md:mb-12 px-4"
           >
             {[
-              { value: "10,000+", label: "Businesses Served" },
-              { value: "£2.4M+", label: "Total Savings" },
-              { value: "4.9/5", label: "Customer Rating" },
-            ].map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="text-2xl md:text-3xl font-bold text-foreground mb-1">
-                  {stat.value}
-                </div>
-                <div className="text-sm text-muted-foreground">{stat.label}</div>
+              { icon: CheckCircle2, text: "100% Free" },
+              { icon: CheckCircle2, text: "2-7 Day Switch" },
+              { icon: CheckCircle2, text: "Expert Support" },
+            ].map((item, i) => (
+              <div key={i} className="flex items-center gap-2 text-sm md:text-base">
+                <item.icon className="w-4 h-4 md:w-5 md:h-5 text-accent" />
+                <span className="text-muted-foreground">{item.text}</span>
               </div>
             ))}
           </motion.div>
 
-          {/* CTA Button */}
+          {/* CTA Buttons - Mobile Optimized */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+            className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center items-stretch sm:items-center px-4"
           >
             <Button
               size="lg"
-              className="bg-gradient-primary shadow-glow hover:shadow-xl transition-all text-lg px-8 py-6 group"
+              className="bg-gradient-to-r from-primary to-primary-hover shadow-glow hover:shadow-xl transition-all text-base md:text-lg px-6 md:px-8 py-5 md:py-6 group w-full sm:w-auto"
               onClick={() => {
                 const calculatorSection = document.getElementById('calculator-section');
                 calculatorSection?.scrollIntoView({ behavior: 'smooth' });
               }}
             >
-              <TrendingUp className="w-5 h-5 mr-2" />
+              <TrendingUp className="w-4 h-4 md:w-5 md:h-5 mr-2" />
               Start Comparing Now
-              <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="w-4 h-4 md:w-5 md:h-5 ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
             <Button
               size="lg"
               variant="outline"
-              className="border-primary/30 hover:border-primary/50 hover:bg-primary/5 text-lg px-8 py-6"
+              className="glass border-border hover:border-primary/50 hover:bg-primary/5 text-base md:text-lg px-6 md:px-8 py-5 md:py-6 w-full sm:w-auto"
               asChild
             >
               <a href="tel:+442012345678">
-                Or Call Us: 020 1234 5678
+                Or Call: 020 1234 5678
               </a>
             </Button>
           </motion.div>
 
-          {/* Trust Indicators */}
+          {/* Stats - Mobile Optimized Grid */}
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.5 }}
-            className="mt-12 flex flex-wrap justify-center gap-4"
+            className="grid grid-cols-3 gap-4 md:gap-8 mt-12 md:mt-16 max-w-3xl mx-auto px-4"
           >
-            {["Free Service", "No Obligation", "Expert Support", "2-7 Day Switch"].map(
-              (badge, i) => (
-                <span
-                  key={i}
-                  className="px-3 py-1 text-xs font-medium bg-card/50 text-muted-foreground rounded-full border border-border/50"
-                >
-                  {badge}
-                </span>
-              )
-            )}
+            {[
+              { value: "10,000+", label: "Businesses" },
+              { value: "£2.4M+", label: "Saved" },
+              { value: "4.9/5", label: "Rating" },
+            ].map((stat, index) => (
+              <div key={index} className="text-center">
+                <div className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mb-1">
+                  {stat.value}
+                </div>
+                <div className="text-xs md:text-sm text-muted-foreground">{stat.label}</div>
+              </div>
+            ))}
           </motion.div>
         </div>
       </div>
