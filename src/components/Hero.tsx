@@ -11,7 +11,7 @@ export const Hero = () => {
       <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-background"></div>
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent"></div>
       
-      <div className="relative container mx-auto px-4 py-12 md:py-16 lg:py-32">
+      <div className="relative container mx-auto px-4 pt-20 md:pt-24 pb-12 md:pb-16 lg:pb-32">
         <div className="text-center max-w-4xl mx-auto">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full glass border border-primary/20 mb-6 md:mb-8">
             <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-primary animate-pulse"></div>
