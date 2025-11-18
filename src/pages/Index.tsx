@@ -5,7 +5,10 @@ import { AutoSuggestion } from "@/components/AutoSuggestion";
 import { Hero } from "@/components/Hero";
 import { CTASection } from "@/components/CTASection";
 import { Footer } from "@/components/Footer";
-
+import { Navigation } from "@/components/Navigation";
+import { HowItWorks } from "@/components/HowItWorks";
+import { SocialProof } from "@/components/SocialProof";
+import { FAQ } from "@/components/FAQ";
 import { CustomProviderForm, CustomProviderData } from "@/components/CustomProviderForm";
 import { GetStartedCard } from "@/components/GetStartedCard";
 import { partners } from "@/data/partners";
@@ -117,6 +120,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Navigation />
       <Hero />
 
       {/* Main Calculator Section */}
@@ -223,6 +227,10 @@ const Index = () => {
         )}
       </div>
 
+      <HowItWorks />
+      <SocialProof />
+      <FAQ />
+      
       <div className="mt-8 md:mt-10">
         <CTASection />
       </div>

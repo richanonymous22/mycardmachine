@@ -7,7 +7,11 @@ import { partners } from "@/data/partners";
 import { calculateMerchantCosts, sanitizeTurnover } from "@/utils/calculations";
 import { RecommendationCard } from "@/components/RecommendationCard";
 import { Footer } from "@/components/Footer";
-
+import { Navigation } from "@/components/Navigation";
+import { HeroV2 } from "@/components/HeroV2";
+import { HowItWorks } from "@/components/HowItWorks";
+import { SocialProof } from "@/components/SocialProof";
+import { FAQ } from "@/components/FAQ";
 import { CTASection } from "@/components/CTASection";
 import { TrendingUp, Sparkles, ChevronDown } from "lucide-react";
 const IndexV2 = () => {
@@ -50,14 +54,11 @@ const IndexV2 = () => {
       setTurnover(0);
     }
   };
-  return <div className="min-h-screen bg-gradient-to-br from-background via-primary/10 to-accent/5 relative overflow-hidden">
-      {/* Animated background orbs */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 -right-40 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-accent/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-      </div>
+  return <div className="min-h-screen bg-background">
+      <Navigation />
+      <HeroV2 />
 
-      <div className="container mx-auto px-4 py-8 md:py-16 relative z-10">
+      <div id="calculator-section" className="container mx-auto px-4 py-8 md:py-16 relative z-10">
         {/* Premium Turnover Input Section */}
         <Card className="max-w-2xl mx-auto mb-12 shadow-2xl border-primary/30 bg-gradient-to-br from-card/95 via-card/90 to-primary/10 relative overflow-hidden backdrop-blur-xl">
           {/* Animated gradient border effect */}
@@ -140,6 +141,10 @@ const IndexV2 = () => {
             )}
           </div>}
       </div>
+
+      <HowItWorks />
+      <SocialProof />
+      <FAQ />
 
       {/* CTA Section - Always visible */}
       <div className="mt-8 md:mt-10">
