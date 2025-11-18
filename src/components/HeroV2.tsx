@@ -52,14 +52,14 @@ export const HeroV2 = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="flex flex-col sm:flex-row flex-wrap justify-center gap-2 sm:gap-4 md:gap-6 mb-8 md:mb-12 px-4 max-w-md sm:max-w-2xl mx-auto"
+            className="flex flex-row flex-wrap justify-center gap-3 sm:gap-4 md:gap-6 mb-8 md:mb-12 px-4 max-w-2xl mx-auto"
           >
             {[
               { icon: CheckCircle2, text: "100% Free" },
               { icon: CheckCircle2, text: "2-7 Day Switch" },
               { icon: CheckCircle2, text: "Expert Support" },
             ].map((item, i) => (
-              <div key={i} className="flex items-center gap-2 text-xs sm:text-sm md:text-base justify-center sm:justify-start">
+              <div key={i} className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm md:text-base">
                 <item.icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 text-accent flex-shrink-0" />
                 <span className="text-muted-foreground whitespace-nowrap">{item.text}</span>
               </div>

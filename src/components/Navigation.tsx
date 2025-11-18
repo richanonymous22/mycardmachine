@@ -27,7 +27,7 @@ export const Navigation = () => {
   }];
   return <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? "bg-card/80 backdrop-blur-xl border-b border-border shadow-lg" : "bg-card/60 backdrop-blur-md"}`}>
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16 md:h-20">
+        <div className="flex items-center justify-between h-16 md:h-18">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group">
             <motion.div whileHover={{
@@ -35,7 +35,7 @@ export const Navigation = () => {
           }} whileTap={{
             scale: 0.95
           }} className="flex items-center gap-3">
-              <div className="relative w-8 h-8 md:w-10 md:h-10">
+              <div className="relative w-10 h-10 md:w-12 md:h-12">
                 <img src={logo} alt="My Card Machine" className="w-full h-full object-contain" />
               </div>
               <div className="flex flex-col">
