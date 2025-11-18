@@ -1,0 +1,10 @@
+project_id = "gkvkixthomqczaoztgyq"
+
+[functions.generate-switch-summary]
+verify_jwt = false
+
+[functions.telegram-notify]
+verify_jwt = false
+
+[functions.telegram-webhook]
+verify_jwt = false
