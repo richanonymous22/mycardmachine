@@ -1,95 +1,147 @@
+import { motion } from "framer-motion";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { HelpCircle } from "lucide-react";
+import { HelpCircle, MessageCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const faqs = [
   {
-    question: "How does the comparison tool work?",
-    answer: "Our comparison tool analyzes your current payment provider's fees and compares them with alternative providers based on your monthly turnover. We calculate transaction costs, monthly fees, and potential savings to help you make an informed decision."
+    question: "How does My Card Machine compare providers?",
+    answer: "We use real-time data from major UK payment providers to calculate exact costs based on your monthly turnover. Our algorithm factors in all fees including transaction rates, authorization fees, and any hidden charges to give you the true cost comparison."
   },
   {
-    question: "Is there any cost to use this service?",
-    answer: "No, our comparison service is completely free to use. We're here to help UK businesses save money on card processing fees without any hidden charges."
-  },
-  {
-    question: "How accurate are the savings calculations?",
-    answer: "Our calculations are based on real provider fee structures and your actual monthly turnover. While we strive for accuracy, final costs may vary slightly depending on your specific business needs and negotiated rates with providers."
+    question: "Is this service really free?",
+    answer: "Yes, completely free. We earn a small commission from providers when you switch, but this never affects your rates. You get the same great deals as going direct, plus our expert support throughout the switching process."
   },
   {
     question: "How long does it take to switch providers?",
-    answer: "Switching typically takes 1-2 weeks depending on the provider. This includes application processing, terminal setup, and integration. We'll guide you through every step to ensure a smooth transition."
+    answer: "Most switches are completed within 5-7 working days. We handle all the paperwork and coordinate with your new provider to ensure a seamless transition with zero downtime for your business."
   },
   {
-    question: "Will I need to buy new equipment?",
-    answer: "Most modern payment providers offer both rental and purchase options for card terminals. Some may offer free terminals as part of their package. We'll help you find the best option for your business."
+    question: "Will I need new equipment?",
+    answer: "It depends on your new provider. Many modern providers offer free card machines as part of their service. We'll advise you on equipment options during the application process and ensure you get the best deal."
   },
   {
-    question: "What if I'm in a contract with my current provider?",
-    answer: "Many providers have early termination fees. However, the potential savings from switching often outweigh these costs. We can help you calculate whether switching makes financial sense in your situation."
+    question: "What if I'm locked in a contract?",
+    answer: "Many providers have notice periods or early termination fees. We'll review your current contract and calculate if the savings from switching still make it worthwhile. Often, the savings far outweigh any exit fees."
   },
   {
-    question: "Do you support all UK payment providers?",
-    answer: "We work with the major UK payment providers including SumUp, Zettle, Square, Dojo, and others. If your current provider isn't listed, you can use our custom provider option to compare costs."
+    question: "How accurate are the savings calculations?",
+    answer: "Our calculations are based on actual provider rates and your specific turnover. While real-world savings can vary based on your exact transaction mix (debit vs credit cards), our estimates are typically within 5% of actual costs."
   },
   {
-    question: "Is my data secure?",
-    answer: "Yes, we take data security seriously. We only collect the information necessary to provide comparisons and never store sensitive payment data. See our Privacy Policy for full details."
+    question: "Do you work with all major UK providers?",
+    answer: "We partner with the UK's leading payment providers including SumUp, Zettle, Square, Paymentsense, and more. This ensures you get access to the most competitive rates in the market."
+  },
+  {
+    question: "What support do you offer after switching?",
+    answer: "We provide ongoing support even after you've switched. If you encounter any issues with your new provider or have questions about your service, our team is here to help at no extra cost."
   }
 ];
 
 export const FAQ = () => {
   return (
-    <section className="py-16 md:py-24 bg-gradient-to-br from-primary/5 via-background to-secondary/5">
-      <div className="container mx-auto px-4 md:px-6">
-        <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 mb-4">
-              <div className="p-3 rounded-xl bg-primary/10">
-                <HelpCircle className="w-6 h-6 text-primary" />
+    <section className="py-16 md:py-24 relative overflow-hidden">
+      {/* Background Effects */}
+      <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-accent/5" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
+
+      <div className="container mx-auto px-4 relative z-10">
+        {/* Section Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-16"
+        >
+          <div className="inline-flex items-center justify-center p-2 bg-primary/10 rounded-full mb-4">
+            <HelpCircle className="w-4 h-4 text-primary mr-2" />
+            <span className="px-3 py-1 text-sm font-semibold text-primary">FAQ</span>
+          </div>
+          <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-4">
+            Questions? <span className="text-transparent bg-clip-text bg-gradient-primary">We've Got Answers</span>
+          </h2>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Everything you need to know about comparing and switching card machines
+          </p>
+        </motion.div>
+
+        {/* FAQ Grid */}
+        <div className="max-w-4xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="glass rounded-2xl border border-border/50 p-6 md:p-8 shadow-premium"
+          >
+            <Accordion type="single" collapsible className="w-full space-y-4">
+              {faqs.map((faq, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: index * 0.05 }}
+                >
+                  <AccordionItem 
+                    value={`item-${index}`} 
+                    className="border border-border/30 rounded-xl px-6 hover:border-primary/50 transition-colors bg-card/30 backdrop-blur-sm"
+                  >
+                    <AccordionTrigger className="text-left hover:no-underline py-5">
+                      <span className="text-base md:text-lg font-semibold text-foreground pr-4">
+                        {faq.question}
+                      </span>
+                    </AccordionTrigger>
+                    <AccordionContent className="text-muted-foreground leading-relaxed pb-5 pt-2">
+                      {faq.answer}
+                    </AccordionContent>
+                  </AccordionItem>
+                </motion.div>
+              ))}
+            </Accordion>
+          </motion.div>
+
+          {/* Contact CTA */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="mt-12 text-center"
+          >
+            <div className="glass rounded-2xl border border-border/50 p-8 inline-block">
+              <MessageCircle className="w-12 h-12 text-primary mx-auto mb-4" />
+              <h3 className="text-xl font-bold text-foreground mb-2">
+                Still have questions?
+              </h3>
+              <p className="text-muted-foreground mb-6 max-w-md">
+                Our expert team is here to help you find the perfect card machine solution
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <Button
+                  size="lg"
+                  className="bg-gradient-primary shadow-glow hover:shadow-xl transition-shadow"
+                  asChild
+                >
+                  <a href="tel:+442012345678">Call Us Now</a>
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-primary/30 hover:border-primary/50 hover:bg-primary/5"
+                  asChild
+                >
+                  <a href="mailto:hello@mycardmachine.com">Email Us</a>
+                </Button>
               </div>
             </div>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Frequently Asked Questions
-            </h2>
-            <p className="text-lg text-muted-foreground">
-              Got questions? We've got answers. Find everything you need to know about switching payment providers.
-            </p>
-          </div>
-
-          <Accordion type="single" collapsible className="space-y-4">
-            {faqs.map((faq, index) => (
-              <AccordionItem
-                key={index}
-                value={`item-${index}`}
-                className="bg-card border border-border rounded-lg px-6 shadow-sm hover:shadow-md transition-shadow"
-              >
-                <AccordionTrigger className="text-left hover:no-underline py-4">
-                  <span className="font-semibold text-foreground pr-4">
-                    {faq.question}
-                  </span>
-                </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground pb-4">
-                  {faq.answer}
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-
-          <div className="mt-12 text-center">
-            <p className="text-muted-foreground mb-4">
-              Still have questions?
-            </p>
-            <a
-              href="mailto:hello@cardcostsclever.co.uk"
-              className="text-primary hover:underline font-semibold"
-            >
-              Contact us at hello@cardcostsclever.co.uk
-            </a>
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>
