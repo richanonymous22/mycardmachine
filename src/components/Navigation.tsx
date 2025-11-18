@@ -1,20 +1,13 @@
 import { useState, useEffect } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Phone, Mail } from "lucide-react";
+import { Menu, X, Phone } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
 export const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const { scrollY } = useScroll();
   const location = useLocation();
-
-  const backgroundColor = useTransform(
-    scrollY,
-    [0, 100],
-    ["rgba(11, 15, 25, 0)", "rgba(11, 15, 25, 0.95)"]
-  );
 
   useEffect(() => {
     const handleScroll = () => {
@@ -31,10 +24,11 @@ export const Navigation = () => {
   ];
 
   return (
-    <motion.nav
-      style={{ backgroundColor }}
+    <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? "shadow-lg backdrop-blur-xl border-b border-border/50" : ""
+        isScrolled 
+          ? "bg-background/95 backdrop-blur-xl border-b border-border/50 shadow-lg" 
+          : "bg-background/80 backdrop-blur-md"
       }`}
     >
       <div className="container mx-auto px-4">
@@ -48,7 +42,7 @@ export const Navigation = () => {
             >
               <div className="relative">
                 <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full group-hover:bg-primary/30 transition-colors" />
-                <div className="relative bg-gradient-to-br from-primary to-primary-hover p-2 rounded-xl shadow-glow">
+                <div className="relative bg-gradient-to-br from-primary to-primary-hover p-2 rounded-xl">
                   <svg
                     className="w-6 h-6 md:w-7 md:h-7 text-primary-foreground"
                     fill="none"
@@ -68,7 +62,7 @@ export const Navigation = () => {
                 <h1 className="text-lg md:text-xl font-bold text-foreground tracking-tight">
                   My Card Machine
                 </h1>
-                <p className="text-xs text-muted-foreground hidden md:block">
+                <p className="text-xs text-muted-foreground hidden sm:block">
                   Find Your Perfect Payment Solution
                 </p>
               </div>
@@ -84,7 +78,7 @@ export const Navigation = () => {
                 className={`relative text-sm font-medium transition-colors hover:text-primary ${
                   location.pathname === link.path
                     ? "text-primary"
-                    : "text-muted-foreground"
+                    : "text-foreground/80"
                 }`}
               >
                 {link.name}
@@ -99,12 +93,12 @@ export const Navigation = () => {
             ))}
           </div>
 
-          {/* CTA Buttons */}
+          {/* CTA Buttons - Desktop */}
           <div className="hidden md:flex items-center space-x-4">
             <Button
               variant="ghost"
               size="sm"
-              className="text-muted-foreground hover:text-foreground"
+              className="text-foreground/80 hover:text-foreground hover:bg-primary/10"
               asChild
             >
               <a href="tel:+442012345678">
@@ -114,7 +108,7 @@ export const Navigation = () => {
             </Button>
             <Button
               size="sm"
-              className="bg-gradient-primary shadow-glow hover:shadow-xl transition-shadow"
+              className="bg-gradient-to-r from-primary to-primary-hover shadow-glow hover:shadow-xl transition-shadow"
               asChild
             >
               <a href="#calculator">
@@ -126,7 +120,7 @@ export const Navigation = () => {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden p-2 rounded-lg hover:bg-muted transition-colors"
+            className="md:hidden p-2 rounded-lg hover:bg-primary/10 transition-colors"
           >
             {isOpen ? (
               <X className="w-6 h-6 text-foreground" />
@@ -140,9 +134,9 @@ export const Navigation = () => {
         <motion.div
           initial={false}
           animate={{ height: isOpen ? "auto" : 0 }}
-          className="overflow-hidden md:hidden"
+          className="overflow-hidden md:hidden bg-background/95 backdrop-blur-xl"
         >
-          <div className="py-4 space-y-4">
+          <div className="py-4 space-y-4 border-t border-border/50">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
@@ -151,17 +145,17 @@ export const Navigation = () => {
                 className={`block py-2 text-sm font-medium transition-colors ${
                   location.pathname === link.path
                     ? "text-primary"
-                    : "text-muted-foreground hover:text-primary"
+                    : "text-foreground/80 hover:text-primary"
                 }`}
               >
                 {link.name}
               </Link>
             ))}
-            <div className="pt-4 space-y-3 border-t border-border">
+            <div className="pt-4 space-y-3 border-t border-border/50">
               <Button
                 variant="outline"
                 size="sm"
-                className="w-full"
+                className="w-full border-border hover:bg-primary/10"
                 asChild
               >
                 <a href="tel:+442012345678">
@@ -171,7 +165,7 @@ export const Navigation = () => {
               </Button>
               <Button
                 size="sm"
-                className="w-full bg-gradient-primary"
+                className="w-full bg-gradient-to-r from-primary to-primary-hover"
                 asChild
               >
                 <a href="#calculator">
@@ -182,6 +176,6 @@ export const Navigation = () => {
           </div>
         </motion.div>
       </div>
-    </motion.nav>
+    </nav>
   );
 };

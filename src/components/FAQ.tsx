@@ -33,23 +33,11 @@ const faqs = [
     question: "How accurate are the savings calculations?",
     answer: "Our calculations are based on actual provider rates and your specific turnover. While real-world savings can vary based on your exact transaction mix (debit vs credit cards), our estimates are typically within 5% of actual costs."
   },
-  {
-    question: "Do you work with all major UK providers?",
-    answer: "We partner with the UK's leading payment providers including SumUp, Zettle, Square, Paymentsense, and more. This ensures you get access to the most competitive rates in the market."
-  },
-  {
-    question: "What support do you offer after switching?",
-    answer: "We provide ongoing support even after you've switched. If you encounter any issues with your new provider or have questions about your service, our team is here to help at no extra cost."
-  }
 ];
 
 export const FAQ = () => {
   return (
-    <section className="py-16 md:py-24 relative overflow-hidden">
-      {/* Background Effects */}
-      <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-accent/5" />
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
-
+    <section className="py-12 md:py-20 relative">
       <div className="container mx-auto px-4 relative z-10">
         {/* Section Header */}
         <motion.div
@@ -57,30 +45,29 @@ export const FAQ = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          className="text-center mb-8 md:mb-12"
         >
-          <div className="inline-flex items-center justify-center p-2 bg-primary/10 rounded-full mb-4">
+          <div className="inline-flex items-center justify-center p-2 rounded-full glass border border-primary/20 mb-4">
             <HelpCircle className="w-4 h-4 text-primary mr-2" />
-            <span className="px-3 py-1 text-sm font-semibold text-primary">FAQ</span>
+            <span className="text-sm font-semibold text-primary">FAQ</span>
           </div>
-          <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-4">
-            Questions? <span className="text-transparent bg-clip-text bg-gradient-primary">We've Got Answers</span>
+          <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-3 md:mb-4">
+            Questions? <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">We've Got Answers</span>
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto px-4">
             Everything you need to know about comparing and switching card machines
           </p>
         </motion.div>
 
-        {/* FAQ Grid */}
-        <div className="max-w-4xl mx-auto">
+        {/* FAQ Accordion */}
+        <div className="max-w-3xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="glass rounded-2xl border border-border/50 p-6 md:p-8 shadow-premium"
           >
-            <Accordion type="single" collapsible className="w-full space-y-4">
+            <Accordion type="single" collapsible className="space-y-3 md:space-y-4">
               {faqs.map((faq, index) => (
                 <motion.div
                   key={index}
@@ -91,14 +78,14 @@ export const FAQ = () => {
                 >
                   <AccordionItem 
                     value={`item-${index}`} 
-                    className="border border-border/30 rounded-xl px-6 hover:border-primary/50 transition-colors bg-card/30 backdrop-blur-sm"
+                    className="glass border border-border/50 rounded-xl px-4 md:px-6 hover:border-primary/50 transition-all duration-300 group"
                   >
-                    <AccordionTrigger className="text-left hover:no-underline py-5">
-                      <span className="text-base md:text-lg font-semibold text-foreground pr-4">
+                    <AccordionTrigger className="text-left hover:no-underline py-4 md:py-5">
+                      <span className="text-sm md:text-base font-semibold text-foreground pr-4 group-hover:text-primary transition-colors">
                         {faq.question}
                       </span>
                     </AccordionTrigger>
-                    <AccordionContent className="text-muted-foreground leading-relaxed pb-5 pt-2">
+                    <AccordionContent className="text-sm md:text-base text-muted-foreground leading-relaxed pb-4 md:pb-5 pt-1">
                       {faq.answer}
                     </AccordionContent>
                   </AccordionItem>
@@ -113,20 +100,20 @@ export const FAQ = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="mt-12 text-center"
+            className="mt-8 md:mt-12 text-center"
           >
-            <div className="glass rounded-2xl border border-border/50 p-8 inline-block">
-              <MessageCircle className="w-12 h-12 text-primary mx-auto mb-4" />
-              <h3 className="text-xl font-bold text-foreground mb-2">
+            <div className="glass rounded-2xl border border-border/50 p-6 md:p-8">
+              <MessageCircle className="w-10 h-10 md:w-12 md:h-12 text-primary mx-auto mb-3 md:mb-4" />
+              <h3 className="text-lg md:text-xl font-bold text-foreground mb-2">
                 Still have questions?
               </h3>
-              <p className="text-muted-foreground mb-6 max-w-md">
+              <p className="text-sm md:text-base text-muted-foreground mb-4 md:mb-6 max-w-md mx-auto">
                 Our expert team is here to help you find the perfect card machine solution
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Button
                   size="lg"
-                  className="bg-gradient-primary shadow-glow hover:shadow-xl transition-shadow"
+                  className="bg-gradient-to-r from-primary to-primary-hover shadow-glow hover:shadow-xl transition-shadow w-full sm:w-auto"
                   asChild
                 >
                   <a href="tel:+442012345678">Call Us Now</a>
@@ -134,7 +121,7 @@ export const FAQ = () => {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="border-primary/30 hover:border-primary/50 hover:bg-primary/5"
+                  className="glass border-border hover:border-primary/50 hover:bg-primary/5 w-full sm:w-auto"
                   asChild
                 >
                   <a href="mailto:hello@mycardmachine.com">Email Us</a>
