@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Phone } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
+import logo from "@/assets/logo.png";
 
 export const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -27,50 +28,39 @@ export const Navigation = () => {
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled 
-          ? "bg-background/95 backdrop-blur-xl border-b border-border/50 shadow-lg" 
-          : "bg-background/80 backdrop-blur-md"
+          ? "bg-card/80 backdrop-blur-xl border-b border-border shadow-lg" 
+          : "bg-card/60 backdrop-blur-md"
       }`}
     >
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2 group">
+          <Link to="/" className="flex items-center gap-3 group">
             <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="flex items-center space-x-3"
+              className="flex items-center gap-3"
             >
-              <div className="relative">
-                <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full group-hover:bg-primary/30 transition-colors" />
-                <div className="relative bg-gradient-to-br from-primary to-primary-hover p-2 rounded-xl">
-                  <svg
-                    className="w-6 h-6 md:w-7 md:h-7 text-primary-foreground"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
-                    />
-                  </svg>
-                </div>
+              <div className="relative w-8 h-8 md:w-10 md:h-10">
+                <img 
+                  src={logo} 
+                  alt="My Card Machine" 
+                  className="w-full h-full object-contain"
+                />
               </div>
-              <div>
-                <h1 className="text-lg md:text-xl font-bold text-foreground tracking-tight">
+              <div className="flex flex-col">
+                <span className="text-base md:text-lg font-bold text-foreground leading-tight">
                   My Card Machine
-                </h1>
-                <p className="text-xs text-muted-foreground hidden sm:block">
-                  Find Your Perfect Payment Solution
-                </p>
+                </span>
+                <span className="text-[10px] md:text-xs text-muted-foreground leading-tight hidden sm:block">
+                  Compare & Save Today
+                </span>
               </div>
             </motion.div>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
@@ -78,7 +68,7 @@ export const Navigation = () => {
                 className={`relative text-sm font-medium transition-colors hover:text-primary ${
                   location.pathname === link.path
                     ? "text-primary"
-                    : "text-foreground/80"
+                    : "text-foreground/70"
                 }`}
               >
                 {link.name}
@@ -94,11 +84,11 @@ export const Navigation = () => {
           </div>
 
           {/* CTA Buttons - Desktop */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden md:flex items-center gap-3">
             <Button
               variant="ghost"
               size="sm"
-              className="text-foreground/80 hover:text-foreground hover:bg-primary/10"
+              className="text-foreground/70 hover:text-foreground hover:bg-primary/10"
               asChild
             >
               <a href="tel:+442012345678">
@@ -108,7 +98,7 @@ export const Navigation = () => {
             </Button>
             <Button
               size="sm"
-              className="bg-gradient-to-r from-primary to-primary-hover shadow-glow hover:shadow-xl transition-shadow"
+              className="bg-gradient-to-r from-primary to-primary-hover shadow-glow hover:shadow-xl transition-all"
               asChild
             >
               <a href="#calculator">
@@ -121,6 +111,7 @@ export const Navigation = () => {
           <button
             onClick={() => setIsOpen(!isOpen)}
             className="md:hidden p-2 rounded-lg hover:bg-primary/10 transition-colors"
+            aria-label="Toggle menu"
           >
             {isOpen ? (
               <X className="w-6 h-6 text-foreground" />
@@ -134,9 +125,9 @@ export const Navigation = () => {
         <motion.div
           initial={false}
           animate={{ height: isOpen ? "auto" : 0 }}
-          className="overflow-hidden md:hidden bg-background/95 backdrop-blur-xl"
+          className="overflow-hidden md:hidden"
         >
-          <div className="py-4 space-y-4 border-t border-border/50">
+          <div className="py-4 space-y-3 border-t border-border/50">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
@@ -145,17 +136,17 @@ export const Navigation = () => {
                 className={`block py-2 text-sm font-medium transition-colors ${
                   location.pathname === link.path
                     ? "text-primary"
-                    : "text-foreground/80 hover:text-primary"
+                    : "text-foreground/70 hover:text-primary"
                 }`}
               >
                 {link.name}
               </Link>
             ))}
-            <div className="pt-4 space-y-3 border-t border-border/50">
+            <div className="pt-3 space-y-2 border-t border-border/50">
               <Button
                 variant="outline"
                 size="sm"
-                className="w-full border-border hover:bg-primary/10"
+                className="w-full"
                 asChild
               >
                 <a href="tel:+442012345678">

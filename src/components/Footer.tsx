@@ -6,18 +6,18 @@ export const Footer = () => {
       <div className="container mx-auto px-4 md:px-6 py-8 md:py-12 rounded-sm bg-[#111318]">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-8 mb-6 md:mb-8">
           <div className="md:col-span-2">
-            <h3 className="text-lg md:text-xl font-bold text-foreground mb-3 md:mb-4">Card Costs Clever</h3>
+            <h3 className="text-lg md:text-xl font-bold text-foreground mb-3 md:mb-4">My Card Machine</h3>
             <p className="text-xs text-muted-foreground leading-relaxed md:text-sm">
-              Card Costs Clever helps UK businesses compare merchant payment rates across major providers like Dojo, Worldpay, Elavon, EVO, Barclays, and Teya. Save money and switch smarter with our free comparison tool.
+              My Card Machine helps UK businesses compare merchant payment rates across major providers like Dojo, Worldpay, Elavon, EVO, Barclays, and Teya. Save money and switch smarter with our free comparison tool.
             </p>
           </div>
           
           <div>
             <h4 className="text-base md:text-lg font-semibold text-foreground mb-3 md:mb-4">Contact Us</h4>
             <div className="space-y-2">
-              <a href="mailto:hello@cardcostsclever.co.uk" className="flex items-center gap-2 text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors">
+              <a href="mailto:hello@mycardmachine.com" className="flex items-center gap-2 text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors">
                 <Mail className="h-4 w-4" />
-                hello@cardcostsclever.co.uk
+                hello@mycardmachine.com
               </a>
               <a href="tel:03301337744" className="flex items-center gap-2 text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors">
                 <Phone className="h-4 w-4" />
@@ -51,7 +51,7 @@ export const Footer = () => {
         
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-xs md:text-sm text-muted-foreground text-center md:text-left">
-            © {new Date().getFullYear()} Card Costs Clever. All rights reserved.
+            © {new Date().getFullYear()} My Card Machine. All rights reserved.
           </p>
           <div className="flex gap-4">
             <a href="/terms" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors">

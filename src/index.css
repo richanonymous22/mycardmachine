@@ -79,9 +79,9 @@
     @apply bg-background text-foreground font-sans antialiased;
     background: hsl(var(--background));
     background-image: 
-      radial-gradient(ellipse 80% 50% at 50% -20%, hsl(217 91% 60% / 0.15), transparent),
-      radial-gradient(circle at 0% 50%, hsl(217 91% 60% / 0.05), transparent 50%),
-      radial-gradient(circle at 100% 50%, hsl(142 76% 36% / 0.05), transparent 50%);
+      radial-gradient(ellipse 80% 50% at 50% -20%, hsl(217 91% 60% / 0.08), transparent),
+      radial-gradient(circle at 0% 50%, hsl(217 91% 60% / 0.03), transparent 50%),
+      radial-gradient(circle at 100% 50%, hsl(142 76% 36% / 0.03), transparent 50%);
     background-attachment: fixed;
   }
   
