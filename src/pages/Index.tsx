@@ -11,7 +11,7 @@ import { SocialProof } from "@/components/SocialProof";
 import { FAQ } from "@/components/FAQ";
 import { CustomProviderForm, CustomProviderData } from "@/components/CustomProviderForm";
 import { GetStartedCard } from "@/components/GetStartedCard";
-import { useProviders, useProviderOffers } from "@/hooks/useProviders";
+import { useProviders, useProviderOffers, usePriorityRules } from "@/hooks/useProviders";
 import { calculateMerchantCosts } from "@/utils/calculations";
 import { Partner } from "@/types/merchant";
 import { TrendingDown, TrendingUp } from "lucide-react";
@@ -25,6 +25,7 @@ const Index = () => {
   // Fetch providers from database
   const { data: dbProviders, isLoading } = useProviders();
   const { data: offers } = useProviderOffers(turnover);
+  const { data: priorityRules } = usePriorityRules(turnover);
   
   // Use database providers if available, otherwise fallback to empty array
   const partners = dbProviders || [];
@@ -138,6 +139,8 @@ const Index = () => {
               currentPartner={currentPartner} 
               turnover={turnover}
               onSuggestionSelect={handleNewPartnerChange}
+              providers={partners}
+              priorityRules={priorityRules}
             />
           </div>
         )}
