@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { ProtectedRoute } from "@/components/admin/ProtectedRoute";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,8 +8,12 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Plus, Edit, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
+import { ProviderFormDialog } from "@/components/admin/ProviderFormDialog";
 
 const ProvidersManagement = () => {
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedProvider, setSelectedProvider] = useState<any>(null);
+
   const { data: providers, isLoading, refetch } = useQuery({
     queryKey: ["admin-providers"],
     queryFn: async () => {
@@ -45,7 +50,10 @@ const ProvidersManagement = () => {
               <h1 className="text-3xl font-bold text-foreground">Providers</h1>
               <p className="text-muted-foreground">Manage payment providers</p>
             </div>
-            <Button>
+            <Button onClick={() => {
+              setSelectedProvider(null);
+              setDialogOpen(true);
+            }}>
               <Plus className="h-4 w-4 mr-2" />
               Add Provider
             </Button>
@@ -84,7 +92,14 @@ const ProvidersManagement = () => {
                             <><Eye className="h-4 w-4 mr-2" /> Activate</>
                           )}
                         </Button>
-                        <Button variant="outline" size="sm">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => {
+                            setSelectedProvider(provider);
+                            setDialogOpen(true);
+                          }}
+                        >
                           <Edit className="h-4 w-4 mr-2" /> Edit
                         </Button>
                       </div>
@@ -115,6 +130,13 @@ const ProvidersManagement = () => {
             </div>
           )}
         </div>
+
+        <ProviderFormDialog
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          provider={selectedProvider}
+          onSuccess={refetch}
+        />
       </AdminLayout>
     </ProtectedRoute>
   );
