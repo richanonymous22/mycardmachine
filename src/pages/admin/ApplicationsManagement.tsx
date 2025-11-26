@@ -6,9 +6,17 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { Mail, Phone, Calendar } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { toast } from "sonner";
 
 const ApplicationsManagement = () => {
-  const { data: applications, isLoading } = useQuery({
+  const { data: applications, isLoading, refetch } = useQuery({
     queryKey: ["admin-applications"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -30,6 +38,21 @@ const ApplicationsManagement = () => {
     completed: "bg-gray-500",
     contacted: "bg-cyan-500",
     converted: "bg-emerald-500",
+  };
+
+  const updateApplicationStatus = async (applicationId: string, newStatus: string) => {
+    try {
+      const { error } = await supabase
+        .from("applications")
+        .update({ status: newStatus as any })
+        .eq("id", applicationId);
+
+      if (error) throw error;
+      toast.success("Application status updated");
+      refetch();
+    } catch (error: any) {
+      toast.error(error.message || "Failed to update status");
+    }
   };
 
   return (
@@ -73,6 +96,24 @@ const ApplicationsManagement = () => {
                           </span>
                         </div>
                       </div>
+                      <Select
+                        value={app.status}
+                        onValueChange={(value) => updateApplicationStatus(app.id, value)}
+                      >
+                        <SelectTrigger className="w-[180px]">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="pending">Pending</SelectItem>
+                          <SelectItem value="documents_uploaded">Documents Uploaded</SelectItem>
+                          <SelectItem value="under_review">Under Review</SelectItem>
+                          <SelectItem value="contacted">Contacted</SelectItem>
+                          <SelectItem value="approved">Approved</SelectItem>
+                          <SelectItem value="rejected">Rejected</SelectItem>
+                          <SelectItem value="completed">Completed</SelectItem>
+                          <SelectItem value="converted">Converted</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                   </CardHeader>
                   <CardContent>

@@ -8,7 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Plus, Edit, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
-import { ProviderFormDialog } from "@/components/admin/ProviderFormDialog";
+import { ImprovedProviderFormDialog } from "@/components/admin/ImprovedProviderFormDialog";
 
 const ProvidersManagement = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -131,7 +131,7 @@ const ProvidersManagement = () => {
           )}
         </div>
 
-        <ProviderFormDialog
+        <ImprovedProviderFormDialog
           open={dialogOpen}
           onOpenChange={setDialogOpen}
           provider={selectedProvider}
