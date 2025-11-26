@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ArrowLeft, Phone, PhoneCall, Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { partners } from "@/data/partners";
+import { useProviders } from "@/hooks/useProviders";
 import { Footer } from "@/components/Footer";
 
 const formSchema = z.object({
@@ -28,15 +28,17 @@ const Callback = () => {
   const partnerId = searchParams.get("partner");
   const monthlyTurnover = parseFloat(searchParams.get("turnover") || "0");
   
-  const partner = partners.find(p => p.id === partnerId);
+  // Fetch providers from database
+  const { data: providers, isLoading: loadingProviders } = useProviders();
+  const partner = providers?.find(p => p.id === partnerId);
   
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    if (!partner || monthlyTurnover === 0) {
+    if (!loadingProviders && (!partner || monthlyTurnover === 0)) {
       navigate("/");
     }
-  }, [partner, monthlyTurnover, navigate]);
+  }, [partner, monthlyTurnover, navigate, loadingProviders]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
