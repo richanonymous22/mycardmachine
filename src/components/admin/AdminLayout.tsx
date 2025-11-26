@@ -66,16 +66,14 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
           })}
         </nav>
 
-        <div className="absolute bottom-6 left-3 right-3 px-3">
-          <Button
-            variant="outline"
-            size="sm"
-            className="w-full justify-start gap-3"
+        <div className="absolute bottom-6 left-3 right-3">
+          <button
             onClick={handleSignOut}
+            className="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-muted-foreground hover:bg-accent hover:text-accent-foreground w-full"
           >
-            <LogOut className="h-4 w-4" />
-            Sign Out
-          </Button>
+            <LogOut className="h-5 w-5" />
+            <span>Sign Out</span>
+          </button>
         </div>
       </aside>
 

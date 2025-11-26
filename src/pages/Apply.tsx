@@ -11,7 +11,7 @@ import { ArrowLeft, ArrowRight, Upload } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { DocumentUpload } from "@/components/DocumentUpload";
-import { partners } from "@/data/partners";
+import { useProviders } from "@/hooks/useProviders";
 import { Footer } from "@/components/Footer";
 
 const formSchema = z.object({
@@ -32,7 +32,9 @@ const Apply = () => {
   const estimatedSavings = parseFloat(searchParams.get("savings") || "0");
   const estimatedCost = parseFloat(searchParams.get("cost") || "0");
   
-  const partner = partners.find(p => p.id === partnerId);
+  // Fetch providers from database
+  const { data: providers, isLoading: loadingProviders } = useProviders();
+  const partner = providers?.find(p => p.id === partnerId);
   
   const [currentStep, setCurrentStep] = useState<FormStep>(1);
   const [applicationId, setApplicationId] = useState<string | null>(null);
@@ -40,10 +42,10 @@ const Apply = () => {
   const [allDocumentsUploaded, setAllDocumentsUploaded] = useState(false);
 
   useEffect(() => {
-    if (!partner || monthlyTurnover === 0) {
+    if (!loadingProviders && (!partner || monthlyTurnover === 0)) {
       navigate("/");
     }
-  }, [partner, monthlyTurnover, navigate]);
+  }, [partner, monthlyTurnover, navigate, loadingProviders]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),

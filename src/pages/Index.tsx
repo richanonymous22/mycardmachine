@@ -11,7 +11,7 @@ import { SocialProof } from "@/components/SocialProof";
 import { FAQ } from "@/components/FAQ";
 import { CustomProviderForm, CustomProviderData } from "@/components/CustomProviderForm";
 import { GetStartedCard } from "@/components/GetStartedCard";
-import { partners } from "@/data/partners";
+import { useProviders, useProviderOffers } from "@/hooks/useProviders";
 import { calculateMerchantCosts } from "@/utils/calculations";
 import { Partner } from "@/types/merchant";
 import { TrendingDown, TrendingUp } from "lucide-react";
@@ -21,6 +21,13 @@ const Index = () => {
   const [newPartner, setNewPartner] = useState<Partner | null>(null);
   const [turnover, setTurnover] = useState<number>(0);
   const [customProviderData, setCustomProviderData] = useState<CustomProviderData | null>(null);
+  
+  // Fetch providers from database
+  const { data: dbProviders, isLoading } = useProviders();
+  const { data: offers } = useProviderOffers(turnover);
+  
+  // Use database providers if available, otherwise fallback to empty array
+  const partners = dbProviders || [];
 
   const handleTurnoverChange = (value: number) => {
     // Store the raw value - sanitization happens in calculations
