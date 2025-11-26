@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { partners } from "@/data/partners";
+import { useProviders, usePriorityRules } from "@/hooks/useProviders";
 import { calculateMerchantCosts, sanitizeTurnover } from "@/utils/calculations";
 import { RecommendationCard } from "@/components/RecommendationCard";
 import { Footer } from "@/components/Footer";
@@ -21,22 +22,49 @@ const IndexV2 = () => {
   const [showAll, setShowAll] = useState(false);
   const [visibleCount, setVisibleCount] = useState(5);
 
+  // Fetch providers from database
+  const { data: dbProviders, isLoading } = useProviders();
+  const { data: priorityRules } = usePriorityRules(turnover);
+  
+  // Use database providers if available, otherwise fallback to hardcoded
+  const activeProviders = dbProviders || partners;
+
   useEffect(() => {
     const sanitizedTurnover = sanitizeTurnover(turnover);
 
     // Calculate costs for all partners (except custom)
-    const recommendations = partners.filter(p => p.id !== "custom").map(partner => {
+    const realPartners = activeProviders.filter(p => p.id !== "custom");
+    const calculatedPartners = realPartners.map(partner => {
       const costs = calculateMerchantCosts(partner, sanitizedTurnover);
       return {
         partner,
         costs,
         monthlyTurnover: sanitizedTurnover
       };
-    }).sort((a, b) => a.costs.totalMonthlyCost - b.costs.totalMonthlyCost);
+    });
 
-    setAllRecommendations(recommendations);
-    setTopRecommendations(recommendations.slice(0, visibleCount));
-  }, [turnover, visibleCount]);
+    // Apply priority rules if available
+    if (priorityRules && priorityRules.length > 0) {
+      const priorityMap = new Map(priorityRules.map(rule => [rule.provider_id, rule.priority_score]));
+      
+      calculatedPartners.sort((a, b) => {
+        const priorityA = priorityMap.get(a.partner.id) || 0;
+        const priorityB = priorityMap.get(b.partner.id) || 0;
+        
+        // Sort by priority first, then by cost
+        if (priorityA !== priorityB) {
+          return priorityB - priorityA;
+        }
+        return a.costs.totalMonthlyCost - b.costs.totalMonthlyCost;
+      });
+    } else {
+      // Default: sort by lowest cost
+      calculatedPartners.sort((a, b) => a.costs.totalMonthlyCost - b.costs.totalMonthlyCost);
+    }
+
+    setAllRecommendations(calculatedPartners);
+    setTopRecommendations(calculatedPartners.slice(0, visibleCount));
+  }, [turnover, visibleCount, activeProviders, priorityRules]);
 
   const remainingCount = allRecommendations.length - visibleCount;
 
@@ -57,6 +85,12 @@ const IndexV2 = () => {
   return <div className="min-h-screen bg-background">
       <Navigation />
       <HeroV2 />
+      
+      {isLoading && (
+        <div className="container mx-auto px-4 py-8 text-center">
+          <p className="text-muted-foreground">Loading providers...</p>
+        </div>
+      )}
 
       <div id="calculator-section" className="container mx-auto px-4 py-8 md:py-16 relative z-10">
         {/* Premium Turnover Input Section */}

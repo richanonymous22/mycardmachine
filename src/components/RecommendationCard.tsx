@@ -5,9 +5,17 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getCalculatedRates } from "@/utils/calculations";
-import { Crown, TrendingUp, Calendar, Clock, AlertCircle, CheckCircle, Loader2, Zap, Phone } from "lucide-react";
+import { Crown, TrendingUp, Calendar, Clock, AlertCircle, CheckCircle, Loader2, Zap, Phone, Gift } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { supabase } from "@/integrations/supabase/client";
+
+interface ProviderOffer {
+  id: string;
+  provider_id: string;
+  title: string;
+  description: string;
+  badge_text: string;
+}
 
 interface RecommendationCardProps {
   partner: Partner;
@@ -25,8 +33,37 @@ export const RecommendationCard = ({
   const navigate = useNavigate();
   const [aiSummary, setAiSummary] = useState<string>("");
   const [loadingSummary, setLoadingSummary] = useState(true);
+  const [activeOffer, setActiveOffer] = useState<ProviderOffer | null>(null);
   const calculatedRates = getCalculatedRates(partner, monthlyTurnover);
   const isTopChoice = rank === 1;
+
+  // Fetch active offers for this provider
+  useEffect(() => {
+    const fetchOffers = async () => {
+      const { data, error } = await supabase
+        .from("provider_offers")
+        .select("*")
+        .eq("provider_id", partner.id)
+        .eq("is_active", true)
+        .lte("start_date", new Date().toISOString())
+        .gte("end_date", new Date().toISOString())
+        .order("priority", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (!error && data) {
+        // Check turnover conditions
+        const meetsMin = data.min_turnover === null || monthlyTurnover >= data.min_turnover;
+        const meetsMax = data.max_turnover === null || monthlyTurnover <= data.max_turnover;
+        
+        if (meetsMin && meetsMax) {
+          setActiveOffer(data as ProviderOffer);
+        }
+      }
+    };
+
+    fetchOffers();
+  }, [partner.id, monthlyTurnover]);
 
   useEffect(() => {
     const generateSummary = () => {
@@ -93,6 +130,14 @@ export const RecommendationCard = ({
       {isTopChoice && (
         <Badge className="absolute -top-3 right-4 bg-primary">
           Best Value
+        </Badge>
+      )}
+
+      {/* Active Offer Badge */}
+      {activeOffer && (
+        <Badge className="absolute top-2 right-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white animate-pulse">
+          <Gift className="w-3 h-3 mr-1" />
+          {activeOffer.badge_text}
         </Badge>
       )}
 
@@ -252,6 +297,24 @@ export const RecommendationCard = ({
         <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
         <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-12 -translate-x-12"></div>
       </div>
+
+      {/* Special Offer Section */}
+      {activeOffer && (
+        <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 rounded-lg p-4 mb-6 border-2 border-green-500/30 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-400/20 to-transparent rounded-full blur-2xl"></div>
+          <div className="relative flex items-start gap-3">
+            <Gift className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+            <div className="flex-1 min-w-0">
+              <h4 className="font-bold text-sm text-green-900 dark:text-green-100 mb-1">
+                {activeOffer.title}
+              </h4>
+              <p className="text-sm text-green-700 dark:text-green-300 leading-relaxed">
+                {activeOffer.description}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       <Separator className="my-4" />
 
