@@ -39,18 +39,34 @@ const providerSchema = z.object({
   machine_models: z.string().min(1, "Machine models are required"),
   features: z.string().min(1, "Features are required"),
   
-  // Simplified fee fields
-  transaction_fee: z.coerce.number().min(0),
-  authorization_fee: z.coerce.number().min(0).default(0),
-  monthly_fee: z.coerce.number().min(0).default(0),
-  chargeback_fee: z.coerce.number().min(0).default(0),
-  refund_fee: z.coerce.number().min(0).default(0),
+  // Fee structure - match Partner type exactly
+  transaction_fee: z.coerce.number().min(0).optional(),
+  monthly_rental: z.coerce.number().min(0).optional(),
+  maintenance_fee: z.coerce.number().min(0).optional(),
+  setup_fee: z.coerce.number().min(0).optional(),
+  dashboard_fee: z.coerce.number().min(0).optional(),
+  pci_fee: z.coerce.number().min(0).optional(),
+  chargeback_fee: z.coerce.number().min(0).optional(),
+  refund_fee: z.coerce.number().min(0).optional(),
+  
+  // Documents required
+  doc_proof_of_id: z.boolean().default(true),
+  doc_proof_of_business: z.boolean().default(true),
+  doc_proof_of_bank: z.boolean().default(true),
+  doc_proof_of_address: z.boolean().default(true),
+  
+  // Device info
+  devices: z.array(z.object({
+    device_name: z.string().min(1),
+    rental_price: z.coerce.number().min(0).optional(),
+    buy_price: z.coerce.number().min(0).optional(),
+  })).optional(),
   
   // Turnover tiers
   turnover_tiers: z.array(z.object({
-    min_turnover: z.coerce.number().min(0),
-    max_turnover: z.coerce.number().min(0),
-    transaction_fee_percent: z.coerce.number().min(0).max(100),
+    range: z.string().min(1),
+    fee: z.coerce.number().min(0),
+    eligible: z.boolean().default(true),
   })).optional(),
 });
 
@@ -86,18 +102,31 @@ export const ImprovedProviderFormDialog = ({
       is_active: provider?.is_active ?? true,
       machine_models: provider?.machine_models?.join(", ") || "",
       features: provider?.features?.join(", ") || "",
-      transaction_fee: provider?.fees?.transactionFee || 0,
-      authorization_fee: provider?.fees?.authorizationFee || 0,
-      monthly_fee: provider?.fees?.monthlyFee || 0,
-      chargeback_fee: provider?.fees?.chargebackFee || 0,
-      refund_fee: provider?.fees?.refundFee || 0,
+      transaction_fee: provider?.fees?.transaction_fee || 0,
+      monthly_rental: provider?.fees?.monthly_rental || 0,
+      maintenance_fee: provider?.fees?.maintenance_fee || 0,
+      setup_fee: provider?.fees?.setup_fee || 0,
+      dashboard_fee: provider?.fees?.dashboard_fee || 0,
+      pci_fee: provider?.fees?.pci_fee || 0,
+      chargeback_fee: provider?.fees?.chargeback_fee || 0,
+      refund_fee: provider?.fees?.refund_fee || 0,
+      doc_proof_of_id: provider?.documents_required?.proof_of_id ?? true,
+      doc_proof_of_business: provider?.documents_required?.proof_of_business ?? true,
+      doc_proof_of_bank: provider?.documents_required?.proof_of_bank ?? true,
+      doc_proof_of_address: provider?.documents_required?.proof_of_address ?? true,
+      devices: provider?.device_info ? (Array.isArray(provider.device_info) ? provider.device_info : [provider.device_info]) : [],
       turnover_tiers: provider?.turnover_tiers || [],
     },
   });
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields: tierFields, append: appendTier, remove: removeTier } = useFieldArray({
     control: form.control,
     name: "turnover_tiers",
+  });
+
+  const { fields: deviceFields, append: appendDevice, remove: removeDevice } = useFieldArray({
+    control: form.control,
+    name: "devices",
   });
 
   useEffect(() => {
@@ -114,11 +143,19 @@ export const ImprovedProviderFormDialog = ({
         is_active: provider.is_active,
         machine_models: provider.machine_models?.join(", ") || "",
         features: provider.features?.join(", ") || "",
-        transaction_fee: provider.fees?.transactionFee || 0,
-        authorization_fee: provider.fees?.authorizationFee || 0,
-        monthly_fee: provider.fees?.monthlyFee || 0,
-        chargeback_fee: provider.fees?.chargebackFee || 0,
-        refund_fee: provider.fees?.refundFee || 0,
+        transaction_fee: provider.fees?.transaction_fee || 0,
+        monthly_rental: provider.fees?.monthly_rental || 0,
+        maintenance_fee: provider.fees?.maintenance_fee || 0,
+        setup_fee: provider.fees?.setup_fee || 0,
+        dashboard_fee: provider.fees?.dashboard_fee || 0,
+        pci_fee: provider.fees?.pci_fee || 0,
+        chargeback_fee: provider.fees?.chargeback_fee || 0,
+        refund_fee: provider.fees?.refund_fee || 0,
+        doc_proof_of_id: provider.documents_required?.proof_of_id ?? true,
+        doc_proof_of_business: provider.documents_required?.proof_of_business ?? true,
+        doc_proof_of_bank: provider.documents_required?.proof_of_bank ?? true,
+        doc_proof_of_address: provider.documents_required?.proof_of_address ?? true,
+        devices: provider.device_info ? (Array.isArray(provider.device_info) ? provider.device_info : [provider.device_info]) : [],
         turnover_tiers: provider.turnover_tiers || [],
       });
     }
@@ -127,16 +164,37 @@ export const ImprovedProviderFormDialog = ({
   const onSubmit = async (data: ProviderFormData) => {
     setIsSubmitting(true);
     try {
-      const machine_models = data.machine_models.split(",").map((s) => s.trim());
-      const features = data.features.split(",").map((s) => s.trim());
+      const machine_models = data.machine_models.split(",").map((s) => s.trim()).filter(Boolean);
+      const features = data.features.split(",").map((s) => s.trim()).filter(Boolean);
 
-      const fees = {
-        transactionFee: data.transaction_fee,
-        authorizationFee: data.authorization_fee,
-        monthlyFee: data.monthly_fee,
-        chargebackFee: data.chargeback_fee,
-        refundFee: data.refund_fee,
+      // Build fees object matching Partner type structure
+      const fees: any = {};
+      if (data.transaction_fee) fees.transaction_fee = data.transaction_fee / 100; // Convert to decimal
+      if (data.monthly_rental) fees.monthly_rental = data.monthly_rental;
+      if (data.maintenance_fee) fees.maintenance_fee = data.maintenance_fee;
+      if (data.setup_fee) fees.setup_fee = data.setup_fee;
+      if (data.dashboard_fee) fees.dashboard_fee = data.dashboard_fee;
+      if (data.pci_fee) fees.pci_fee = data.pci_fee;
+      if (data.chargeback_fee) fees.chargeback_fee = data.chargeback_fee;
+      if (data.refund_fee) fees.refund_fee = data.refund_fee;
+
+      const documents_required = {
+        proof_of_id: data.doc_proof_of_id,
+        proof_of_business: data.doc_proof_of_business,
+        proof_of_bank: data.doc_proof_of_bank,
+        proof_of_address: data.doc_proof_of_address,
       };
+
+      const device_info = data.devices && data.devices.length > 0 ? data.devices : null;
+
+      // Process turnover tiers if exists
+      const turnover_tiers = data.turnover_tiers && data.turnover_tiers.length > 0 
+        ? data.turnover_tiers.map(tier => ({
+            range: tier.range,
+            fee: tier.fee / 100, // Convert to decimal
+            eligible: tier.eligible
+          }))
+        : null;
 
       const providerData = {
         id: data.id,
@@ -151,7 +209,9 @@ export const ImprovedProviderFormDialog = ({
         machine_models,
         features,
         fees,
-        turnover_tiers: data.turnover_tiers && data.turnover_tiers.length > 0 ? data.turnover_tiers : null,
+        documents_required,
+        device_info,
+        turnover_tiers,
       };
 
       if (isEdit) {
@@ -175,6 +235,7 @@ export const ImprovedProviderFormDialog = ({
       onOpenChange(false);
       form.reset();
     } catch (error: any) {
+      console.error("Provider save error:", error);
       toast.error(error.message || "Failed to save provider");
     } finally {
       setIsSubmitting(false);
@@ -340,6 +401,7 @@ export const ImprovedProviderFormDialog = ({
             {/* Fee Structure */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold">Fee Structure</h3>
+              <p className="text-sm text-muted-foreground">Enter percentage fees as whole numbers (e.g., 1.69 for 1.69%)</p>
               
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 <FormField
@@ -351,6 +413,7 @@ export const ImprovedProviderFormDialog = ({
                       <FormControl>
                         <Input type="number" step="0.01" {...field} placeholder="1.69" />
                       </FormControl>
+                      <FormDescription>Main transaction fee %</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -358,10 +421,10 @@ export const ImprovedProviderFormDialog = ({
 
                 <FormField
                   control={form.control}
-                  name="authorization_fee"
+                  name="monthly_rental"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Authorization Fee (£)</FormLabel>
+                      <FormLabel>Monthly Rental (£)</FormLabel>
                       <FormControl>
                         <Input type="number" step="0.01" {...field} placeholder="0" />
                       </FormControl>
@@ -372,10 +435,52 @@ export const ImprovedProviderFormDialog = ({
 
                 <FormField
                   control={form.control}
-                  name="monthly_fee"
+                  name="maintenance_fee"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Monthly Fee (£)</FormLabel>
+                      <FormLabel>Maintenance Fee (£)</FormLabel>
+                      <FormControl>
+                        <Input type="number" step="0.01" {...field} placeholder="0" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="setup_fee"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Setup Fee (£)</FormLabel>
+                      <FormControl>
+                        <Input type="number" step="0.01" {...field} placeholder="0" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="dashboard_fee"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Dashboard Fee (£)</FormLabel>
+                      <FormControl>
+                        <Input type="number" step="0.01" {...field} placeholder="0" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="pci_fee"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>PCI Fee (£)</FormLabel>
                       <FormControl>
                         <Input type="number" step="0.01" {...field} placeholder="0" />
                       </FormControl>
@@ -414,35 +519,35 @@ export const ImprovedProviderFormDialog = ({
               </div>
             </div>
 
-            {/* Turnover Tiers */}
+            {/* Device Information */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-lg font-semibold">Turnover Tiers (Optional)</h3>
-                  <p className="text-sm text-muted-foreground">Define different fee rates based on turnover ranges</p>
+                  <h3 className="text-lg font-semibold">Device Information (Optional)</h3>
+                  <p className="text-sm text-muted-foreground">Add multiple machines with buy/rent options</p>
                 </div>
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() => append({ min_turnover: 0, max_turnover: 10000, transaction_fee_percent: 1.5 })}
+                  onClick={() => appendDevice({ device_name: "", rental_price: 0, buy_price: 0 })}
                 >
                   <Plus className="h-4 w-4 mr-2" />
-                  Add Tier
+                  Add Device
                 </Button>
               </div>
 
-              {fields.map((field, index) => (
+              {deviceFields.map((field, index) => (
                 <div key={field.id} className="flex gap-4 items-start p-4 border rounded-lg">
                   <div className="grid grid-cols-3 gap-4 flex-1">
                     <FormField
                       control={form.control}
-                      name={`turnover_tiers.${index}.min_turnover`}
+                      name={`devices.${index}.device_name`}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Min Turnover (£)</FormLabel>
+                          <FormLabel>Device Name</FormLabel>
                           <FormControl>
-                            <Input type="number" {...field} placeholder="0" />
+                            <Input {...field} placeholder="SumUp Air" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -451,12 +556,12 @@ export const ImprovedProviderFormDialog = ({
 
                     <FormField
                       control={form.control}
-                      name={`turnover_tiers.${index}.max_turnover`}
+                      name={`devices.${index}.rental_price`}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Max Turnover (£)</FormLabel>
+                          <FormLabel>Rental Price (£/month)</FormLabel>
                           <FormControl>
-                            <Input type="number" {...field} placeholder="10000" />
+                            <Input type="number" step="0.01" {...field} placeholder="19.99" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -465,12 +570,12 @@ export const ImprovedProviderFormDialog = ({
 
                     <FormField
                       control={form.control}
-                      name={`turnover_tiers.${index}.transaction_fee_percent`}
+                      name={`devices.${index}.buy_price`}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Fee (%)</FormLabel>
+                          <FormLabel>Buy Price (£)</FormLabel>
                           <FormControl>
-                            <Input type="number" step="0.01" {...field} placeholder="1.5" />
+                            <Input type="number" step="0.01" {...field} placeholder="99.00" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -483,7 +588,144 @@ export const ImprovedProviderFormDialog = ({
                     variant="ghost"
                     size="icon"
                     className="mt-8"
-                    onClick={() => remove(index)}
+                    onClick={() => removeDevice(index)}
+                  >
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+
+            {/* Documents Required */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Documents Required</h3>
+              <p className="text-sm text-muted-foreground">Select which documents are required for this provider</p>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="doc_proof_of_id"
+                  render={({ field }) => (
+                    <FormItem className="flex items-center gap-2 space-y-0 p-3 border rounded-lg">
+                      <FormControl>
+                        <Switch checked={field.value} onCheckedChange={field.onChange} />
+                      </FormControl>
+                      <FormLabel className="!mt-0 cursor-pointer">Proof of ID</FormLabel>
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="doc_proof_of_business"
+                  render={({ field }) => (
+                    <FormItem className="flex items-center gap-2 space-y-0 p-3 border rounded-lg">
+                      <FormControl>
+                        <Switch checked={field.value} onCheckedChange={field.onChange} />
+                      </FormControl>
+                      <FormLabel className="!mt-0 cursor-pointer">Proof of Business</FormLabel>
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="doc_proof_of_bank"
+                  render={({ field }) => (
+                    <FormItem className="flex items-center gap-2 space-y-0 p-3 border rounded-lg">
+                      <FormControl>
+                        <Switch checked={field.value} onCheckedChange={field.onChange} />
+                      </FormControl>
+                      <FormLabel className="!mt-0 cursor-pointer">Proof of Bank</FormLabel>
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="doc_proof_of_address"
+                  render={({ field }) => (
+                    <FormItem className="flex items-center gap-2 space-y-0 p-3 border rounded-lg">
+                      <FormControl>
+                        <Switch checked={field.value} onCheckedChange={field.onChange} />
+                      </FormControl>
+                      <FormLabel className="!mt-0 cursor-pointer">Proof of Address</FormLabel>
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+
+            {/* Turnover Tiers */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold">Turnover Tiers (Optional)</h3>
+                  <p className="text-sm text-muted-foreground">Define different fees for turnover ranges (e.g., "5000-10000" or "50000+")</p>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => appendTier({ range: "5000-10000", fee: 1.5, eligible: true })}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Tier
+                </Button>
+              </div>
+
+              {tierFields.map((field, index) => (
+                <div key={field.id} className="flex gap-4 items-start p-4 border rounded-lg">
+                  <div className="grid grid-cols-3 gap-4 flex-1">
+                    <FormField
+                      control={form.control}
+                      name={`turnover_tiers.${index}.range`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Range</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder="5000-10000 or 50000+" />
+                          </FormControl>
+                          <FormDescription>Format: "min-max" or "min+"</FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name={`turnover_tiers.${index}.fee`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Fee (%)</FormLabel>
+                          <FormControl>
+                            <Input type="number" step="0.01" {...field} placeholder="1.5" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name={`turnover_tiers.${index}.eligible`}
+                      render={({ field }) => (
+                        <FormItem className="flex items-center gap-2 space-y-0 pt-8">
+                          <FormControl>
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
+                          </FormControl>
+                          <FormLabel className="!mt-0">Eligible</FormLabel>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="mt-8"
+                    onClick={() => removeTier(index)}
                   >
                     <Trash2 className="h-4 w-4 text-destructive" />
                   </Button>

@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getCalculatedRates } from "@/utils/calculations";
-import { Crown, TrendingUp, Calendar, Clock, AlertCircle, CheckCircle, Loader2, Zap, Phone, Gift } from "lucide-react";
+import { Crown, TrendingUp, Calendar, Clock, AlertCircle, CheckCircle, Loader2, Zap, Phone, Gift, Sparkles } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -135,10 +135,15 @@ export const RecommendationCard = ({
 
       {/* Active Offer Badge */}
       {activeOffer && (
-        <Badge className="absolute top-2 right-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white animate-pulse">
-          <Gift className="w-3 h-3 mr-1" />
-          {activeOffer.badge_text}
-        </Badge>
+        <div className="absolute -top-2 -right-2 z-10">
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-orange-600 rounded-full blur-md animate-pulse"></div>
+            <Badge className="relative bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white border-2 border-white shadow-lg px-3 py-1.5 text-xs font-bold uppercase tracking-wide">
+              <Gift className="w-3.5 h-3.5 mr-1.5 animate-bounce" />
+              {activeOffer.badge_text}
+            </Badge>
+          </div>
+        </div>
       )}
 
       {/* Header */}
@@ -300,17 +305,27 @@ export const RecommendationCard = ({
 
       {/* Special Offer Section */}
       {activeOffer && (
-        <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 rounded-lg p-4 mb-6 border-2 border-green-500/30 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-400/20 to-transparent rounded-full blur-2xl"></div>
-          <div className="relative flex items-start gap-3">
-            <Gift className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
-            <div className="flex-1 min-w-0">
-              <h4 className="font-bold text-sm text-green-900 dark:text-green-100 mb-1">
-                {activeOffer.title}
-              </h4>
-              <p className="text-sm text-green-700 dark:text-green-300 leading-relaxed">
-                {activeOffer.description}
-              </p>
+        <div className="relative mb-6 group">
+          <div className="absolute -inset-1 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 rounded-xl opacity-75 blur-sm group-hover:opacity-100 transition-opacity animate-pulse"></div>
+          <div className="relative bg-gradient-to-br from-amber-50 via-orange-50 to-amber-50 dark:from-amber-950/30 dark:via-orange-950/30 dark:to-amber-950/30 rounded-xl p-5 border-2 border-amber-400/50 shadow-lg overflow-hidden">
+            <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-amber-400/30 via-orange-400/20 to-transparent rounded-full blur-3xl animate-pulse"></div>
+            <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-orange-400/20 to-transparent rounded-full blur-2xl"></div>
+            
+            <div className="relative flex items-start gap-4">
+              <div className="flex-shrink-0 p-2 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg shadow-lg">
+                <Gift className="w-6 h-6 text-white animate-bounce" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-2">
+                  <h4 className="font-bold text-base text-amber-900 dark:text-amber-100 uppercase tracking-wide">
+                    {activeOffer.title}
+                  </h4>
+                  <Sparkles className="w-4 h-4 text-amber-600 dark:text-amber-400 animate-pulse" />
+                </div>
+                <p className="text-sm text-amber-800 dark:text-amber-200 leading-relaxed font-medium">
+                  {activeOffer.description}
+                </p>
+              </div>
             </div>
           </div>
         </div>

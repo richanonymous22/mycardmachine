@@ -34,36 +34,43 @@ const IndexV2 = () => {
 
     // Calculate costs for all partners (except custom)
     const realPartners = activeProviders.filter(p => p.id !== "custom");
-    const calculatedPartners = realPartners.map(partner => {
-      const costs = calculateMerchantCosts(partner, sanitizedTurnover);
-      return {
-        partner,
-        costs,
-        monthlyTurnover: sanitizedTurnover
-      };
-    });
+    const calculatedPartners = realPartners
+      .map(partner => {
+        try {
+          const costs = calculateMerchantCosts(partner, sanitizedTurnover);
+          return {
+            partner,
+            costs,
+            monthlyTurnover: sanitizedTurnover
+          };
+        } catch (error) {
+          console.error(`Error calculating costs for ${partner.name}:`, error);
+          return null;
+        }
+      })
+      .filter(Boolean); // Remove any null values from errors
 
     // Apply priority rules if available
     if (priorityRules && priorityRules.length > 0) {
       const priorityMap = new Map(priorityRules.map(rule => [rule.provider_id, rule.priority_score]));
       
       calculatedPartners.sort((a, b) => {
-        const priorityA = priorityMap.get(a.partner.id) || 0;
-        const priorityB = priorityMap.get(b.partner.id) || 0;
+        const priorityA = priorityMap.get(a!.partner.id) || 0;
+        const priorityB = priorityMap.get(b!.partner.id) || 0;
         
         // Sort by priority first, then by cost
         if (priorityA !== priorityB) {
           return priorityB - priorityA;
         }
-        return a.costs.totalMonthlyCost - b.costs.totalMonthlyCost;
+        return a!.costs.totalMonthlyCost - b!.costs.totalMonthlyCost;
       });
     } else {
       // Default: sort by lowest cost
-      calculatedPartners.sort((a, b) => a.costs.totalMonthlyCost - b.costs.totalMonthlyCost);
+      calculatedPartners.sort((a, b) => a!.costs.totalMonthlyCost - b!.costs.totalMonthlyCost);
     }
 
-    setAllRecommendations(calculatedPartners);
-    setTopRecommendations(calculatedPartners.slice(0, visibleCount));
+    setAllRecommendations(calculatedPartners as any[]);
+    setTopRecommendations(calculatedPartners.slice(0, visibleCount) as any[]);
   }, [turnover, visibleCount, activeProviders, priorityRules]);
 
   const remainingCount = allRecommendations.length - visibleCount;
