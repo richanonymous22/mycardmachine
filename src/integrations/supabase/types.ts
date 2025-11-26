@@ -151,6 +151,163 @@ export type Database = {
         }
         Relationships: []
       }
+      priority_rules: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          max_turnover: number
+          min_turnover: number
+          priority_score: number
+          provider_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          max_turnover: number
+          min_turnover: number
+          priority_score?: number
+          provider_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          max_turnover?: number
+          min_turnover?: number
+          priority_score?: number
+          provider_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "priority_rules_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "providers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      provider_offers: {
+        Row: {
+          badge_text: string
+          created_at: string
+          description: string
+          end_date: string
+          id: string
+          is_active: boolean
+          max_turnover: number | null
+          min_turnover: number | null
+          priority: number
+          provider_id: string
+          start_date: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          badge_text: string
+          created_at?: string
+          description: string
+          end_date: string
+          id?: string
+          is_active?: boolean
+          max_turnover?: number | null
+          min_turnover?: number | null
+          priority?: number
+          provider_id: string
+          start_date: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          badge_text?: string
+          created_at?: string
+          description?: string
+          end_date?: string
+          id?: string
+          is_active?: boolean
+          max_turnover?: number | null
+          min_turnover?: number | null
+          priority?: number
+          provider_id?: string
+          start_date?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "provider_offers_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "providers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      providers: {
+        Row: {
+          auto_renewal: boolean
+          contract_length: string
+          created_at: string
+          device_info: Json | null
+          display_order: number
+          documents_required: Json | null
+          early_termination_fee: string | null
+          features: string[]
+          fees: Json
+          id: string
+          is_active: boolean
+          logo_url: string | null
+          machine_models: string[]
+          name: string
+          settlement_time: string
+          turnover_tiers: Json | null
+          updated_at: string
+        }
+        Insert: {
+          auto_renewal?: boolean
+          contract_length: string
+          created_at?: string
+          device_info?: Json | null
+          display_order?: number
+          documents_required?: Json | null
+          early_termination_fee?: string | null
+          features?: string[]
+          fees: Json
+          id: string
+          is_active?: boolean
+          logo_url?: string | null
+          machine_models: string[]
+          name: string
+          settlement_time: string
+          turnover_tiers?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          auto_renewal?: boolean
+          contract_length?: string
+          created_at?: string
+          device_info?: Json | null
+          display_order?: number
+          documents_required?: Json | null
+          early_termination_fee?: string | null
+          features?: string[]
+          fees?: Json
+          id?: string
+          is_active?: boolean
+          logo_url?: string | null
+          machine_models?: string[]
+          name?: string
+          settlement_time?: string
+          turnover_tiers?: Json | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
