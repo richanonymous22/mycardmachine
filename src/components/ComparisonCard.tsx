@@ -1,11 +1,21 @@
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Partner } from "@/types/merchant";
-import { partners } from "@/data/partners";
 import { getCalculatedRates } from "@/utils/calculations";
+import { Gift } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+
+interface ProviderOffer {
+  id: string;
+  provider_id: string;
+  title: string;
+  description: string;
+  badge_text: string;
+}
 
 interface ComparisonCardProps {
   title: string;
@@ -21,6 +31,7 @@ interface ComparisonCardProps {
     annualCost: number;
   };
   variant?: "current" | "new";
+  providers?: Partner[];
 }
 
 export const ComparisonCard = ({
@@ -31,17 +42,64 @@ export const ComparisonCard = ({
   onTurnoverChange,
   showTurnoverInput = false,
   calculationResult,
-  variant = "current"
+  variant = "current",
+  providers = []
 }: ComparisonCardProps) => {
   const isPrimary = variant === "new";
+  const [activeOffer, setActiveOffer] = useState<ProviderOffer | null>(null);
   
   // Calculate real-time rates based on turnover
   const calculatedRates = selectedPartner && turnover && turnover > 0 
     ? getCalculatedRates(selectedPartner, turnover)
     : null;
+
+  // Fetch active offer for the selected provider
+  useEffect(() => {
+    if (!selectedPartner || !turnover) {
+      setActiveOffer(null);
+      return;
+    }
+
+    const fetchOffer = async () => {
+      const { data, error } = await supabase
+        .from("provider_offers")
+        .select("*")
+        .eq("provider_id", selectedPartner.id)
+        .eq("is_active", true)
+        .lte("start_date", new Date().toISOString())
+        .gte("end_date", new Date().toISOString())
+        .order("priority", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (!error && data) {
+        const meetsMin = data.min_turnover === null || turnover >= data.min_turnover;
+        const meetsMax = data.max_turnover === null || turnover <= data.max_turnover;
+        
+        if (meetsMin && meetsMax) {
+          setActiveOffer(data as ProviderOffer);
+        }
+      }
+    };
+
+    fetchOffer();
+  }, [selectedPartner, turnover]);
   
   return (
       <Card className="glass shadow-xl border border-card-border relative overflow-hidden group transition-all duration-500 hover:shadow-2xl hover:scale-[1.01]">
+        {/* Active Offer Badge */}
+        {activeOffer && (
+          <div className="absolute -top-2 -right-2 z-10">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-orange-600 rounded-full blur-md animate-pulse"></div>
+              <Badge className="relative bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white border-2 border-white shadow-lg px-3 py-1.5 text-xs font-bold uppercase tracking-wide">
+                <Gift className="w-3.5 h-3.5 mr-1.5 animate-bounce" />
+                {activeOffer.badge_text}
+              </Badge>
+            </div>
+          </div>
+        )}
+        
         {/* Gradient overlay */}
         <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${
           isPrimary ? 'bg-gradient-to-br from-primary/5 to-transparent' : 'bg-gradient-to-br from-accent/5 to-transparent'
@@ -76,7 +134,7 @@ export const ComparisonCard = ({
           <Label htmlFor={`partner-${variant}`} className="text-xs md:text-sm font-semibold text-foreground">
             Payment Partner
           </Label>
-          <Select onValueChange={onPartnerChange}>
+          <Select onValueChange={onPartnerChange} value={selectedPartner?.id}>
             <SelectTrigger 
               id={`partner-${variant}`} 
               className="h-12 md:h-14 glass border-card-border hover:border-primary/30 transition-all duration-200 focus-ring text-sm md:text-base"
@@ -84,7 +142,7 @@ export const ComparisonCard = ({
               <SelectValue placeholder="Select a payment partner..." />
             </SelectTrigger>
             <SelectContent className="glass border-card-border shadow-xl max-h-60 bg-card z-50">
-              {partners.map((partner) => (
+              {providers.map((partner) => (
                 <SelectItem 
                   key={partner.id} 
                   value={partner.id}
@@ -243,6 +301,30 @@ export const ComparisonCard = ({
                 {/* Background decoration */}
                 <div className="absolute top-0 right-0 w-20 h-20 md:w-32 md:h-32 bg-white/5 rounded-full -translate-y-10 translate-x-10 md:-translate-y-16 md:translate-x-16"></div>
                 <div className="absolute bottom-0 left-0 w-16 h-16 md:w-24 md:h-24 bg-white/5 rounded-full translate-y-8 -translate-x-8 md:translate-y-12 md:-translate-x-12"></div>
+              </div>
+            )}
+
+            {/* Special Offer Display */}
+            {activeOffer && (
+              <div className="relative mb-6 group">
+                <div className="absolute -inset-1 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 rounded-xl opacity-75 blur-sm group-hover:opacity-100 transition-opacity animate-pulse"></div>
+                <div className="relative bg-gradient-to-br from-amber-50 via-orange-50 to-amber-50 dark:from-amber-950/30 dark:via-orange-950/30 dark:to-amber-950/30 rounded-xl p-4 border-2 border-amber-400/50 shadow-lg overflow-hidden">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-amber-400/30 via-orange-400/20 to-transparent rounded-full blur-3xl animate-pulse"></div>
+                  
+                  <div className="relative flex items-start gap-3">
+                    <div className="flex-shrink-0 p-2 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg shadow-lg">
+                      <Gift className="w-5 h-5 text-white animate-bounce" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-bold text-sm text-amber-900 dark:text-amber-100 uppercase tracking-wide mb-1">
+                        {activeOffer.title}
+                      </h4>
+                      <p className="text-xs text-amber-800 dark:text-amber-200 leading-relaxed">
+                        {activeOffer.description}
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
 
