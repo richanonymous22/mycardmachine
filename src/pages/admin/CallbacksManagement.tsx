@@ -6,9 +6,17 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { Mail, Phone, Calendar, Clock } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { toast } from "sonner";
 
 const CallbacksManagement = () => {
-  const { data: callbacks, isLoading } = useQuery({
+  const { data: callbacks, isLoading, refetch } = useQuery({
     queryKey: ["admin-callbacks"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -28,6 +36,21 @@ const CallbacksManagement = () => {
     completed: "bg-green-500",
     cancelled: "bg-red-500",
     converted: "bg-emerald-500",
+  };
+
+  const updateCallbackStatus = async (callbackId: string, newStatus: string) => {
+    try {
+      const { error } = await supabase
+        .from("callback_requests")
+        .update({ status: newStatus as any })
+        .eq("id", callbackId);
+
+      if (error) throw error;
+      toast.success("Callback status updated");
+      refetch();
+    } catch (error: any) {
+      toast.error(error.message || "Failed to update status");
+    }
   };
 
   return (
@@ -73,6 +96,22 @@ const CallbacksManagement = () => {
                           </span>
                         </div>
                       </div>
+                      <Select
+                        value={callback.status}
+                        onValueChange={(value) => updateCallbackStatus(callback.id, value)}
+                      >
+                        <SelectTrigger className="w-[160px]">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="pending">Pending</SelectItem>
+                          <SelectItem value="contacted">Contacted</SelectItem>
+                          <SelectItem value="scheduled">Scheduled</SelectItem>
+                          <SelectItem value="completed">Completed</SelectItem>
+                          <SelectItem value="cancelled">Cancelled</SelectItem>
+                          <SelectItem value="converted">Converted</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                   </CardHeader>
                   <CardContent>

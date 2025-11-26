@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { ProtectedRoute } from "@/components/admin/ProtectedRoute";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,9 +7,13 @@ import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Plus, Edit, TrendingUp } from "lucide-react";
+import { PriorityRuleFormDialog } from "@/components/admin/PriorityRuleFormDialog";
 
 const PriorityRulesManagement = () => {
-  const { data: rules, isLoading } = useQuery({
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedRule, setSelectedRule] = useState<any>(null);
+
+  const { data: rules, isLoading, refetch } = useQuery({
     queryKey: ["admin-priority-rules"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -32,7 +37,10 @@ const PriorityRulesManagement = () => {
                 Control provider recommendations based on turnover
               </p>
             </div>
-            <Button>
+            <Button onClick={() => {
+              setSelectedRule(null);
+              setDialogOpen(true);
+            }}>
               <Plus className="h-4 w-4 mr-2" />
               Add Rule
             </Button>
@@ -60,7 +68,14 @@ const PriorityRulesManagement = () => {
                           Priority Score: {rule.priority_score}
                         </CardDescription>
                       </div>
-                      <Button variant="outline" size="sm">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => {
+                          setSelectedRule(rule);
+                          setDialogOpen(true);
+                        }}
+                      >
                         <Edit className="h-4 w-4 mr-2" /> Edit
                       </Button>
                     </div>
@@ -92,6 +107,13 @@ const PriorityRulesManagement = () => {
             </div>
           )}
         </div>
+
+        <PriorityRuleFormDialog
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          rule={selectedRule}
+          onSuccess={refetch}
+        />
       </AdminLayout>
     </ProtectedRoute>
   );

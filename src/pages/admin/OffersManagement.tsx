@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { ProtectedRoute } from "@/components/admin/ProtectedRoute";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,9 +8,13 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Plus, Edit, Calendar } from "lucide-react";
 import { format } from "date-fns";
+import { OfferFormDialog } from "@/components/admin/OfferFormDialog";
 
 const OffersManagement = () => {
-  const { data: offers, isLoading } = useQuery({
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedOffer, setSelectedOffer] = useState<any>(null);
+
+  const { data: offers, isLoading, refetch } = useQuery({
     queryKey: ["admin-offers"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -38,7 +43,10 @@ const OffersManagement = () => {
               <h1 className="text-3xl font-bold text-foreground">Offers</h1>
               <p className="text-muted-foreground">Manage timely promotions and offers</p>
             </div>
-            <Button>
+            <Button onClick={() => {
+              setSelectedOffer(null);
+              setDialogOpen(true);
+            }}>
               <Plus className="h-4 w-4 mr-2" />
               Create Offer
             </Button>
@@ -68,7 +76,14 @@ const OffersManagement = () => {
                             {offer.providers?.name} • Priority: {offer.priority}
                           </CardDescription>
                         </div>
-                        <Button variant="outline" size="sm">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => {
+                            setSelectedOffer(offer);
+                            setDialogOpen(true);
+                          }}
+                        >
                           <Edit className="h-4 w-4 mr-2" /> Edit
                         </Button>
                       </div>
@@ -108,6 +123,13 @@ const OffersManagement = () => {
             </div>
           )}
         </div>
+
+        <OfferFormDialog
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          offer={selectedOffer}
+          onSuccess={refetch}
+        />
       </AdminLayout>
     </ProtectedRoute>
   );
