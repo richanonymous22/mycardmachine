@@ -42,7 +42,8 @@ const getFeeFromTiers = (turnoverTiers: any[] | undefined, monthlyTurnover: numb
   for (const tier of turnoverTiers) {
     if (tier.eligible === false) continue;
     
-    const rangeMatch = tier.range.match(/(\d+)(?:–(\d+)|\+)?/);
+    // Support both regular hyphen (-) and en-dash (–)
+    const rangeMatch = tier.range.match(/(\d+)(?:[-–](\d+)|\+)?/);
     if (!rangeMatch) continue;
     
     const minValue = parseInt(rangeMatch[1]);
