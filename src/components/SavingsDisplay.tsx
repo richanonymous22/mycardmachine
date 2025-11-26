@@ -28,52 +28,48 @@ export const SavingsDisplay = ({
   const [loadingSummary, setLoadingSummary] = useState(true);
 
   useEffect(() => {
-    const generateSummary = async () => {
+    const generateSummary = () => {
       if (!currentPartner || !newPartner) return;
       
       setLoadingSummary(true);
       try {
-        // Build key advantages array
-        const keyAdvantages: string[] = [];
-        if (currentPartner.contract_length?.includes("18") && newPartner.contract_length === "No contract") {
-          keyAdvantages.push("No long-term contract commitment");
-        }
-        if (newPartner.settlement_time?.includes("Same day")) {
-          keyAdvantages.push("Same-day settlement");
-        }
-        if (newPartner.benefits?.includes("Daily payouts") || newPartner.features?.includes("Daily payouts")) {
-          keyAdvantages.push("Daily payouts");
-        }
-
-        const { data, error } = await supabase.functions.invoke('generate-switch-summary', {
-          body: {
-            currentProvider: currentPartner.name,
-            newProvider: newPartner.name,
-            monthlySavings,
-            annualSavings,
-            isSaving,
-            comparison: {
-              current: currentPartner,
-              newProvider: newPartner
-            },
-            keyAdvantages
+        // Generate concise, professional summary like in /v2
+        const benefits = newPartner.benefits || newPartner.features || [];
+        const topBenefits = benefits.slice(0, 3);
+        
+        let summary = `${newPartner.name} offers `;
+        
+        if (topBenefits.length > 0) {
+          summary += topBenefits.slice(0, 2).join(", ");
+          if (topBenefits.length > 2) {
+            summary += `, and ${topBenefits[2]}`;
           }
-        });
-
-        if (error) throw error;
-        // Clean any markdown artifacts
-        const cleanSummary = data.summary.replace(/\*\*/g, '').replace(/\*/g, '').trim();
-        setAiSummary(cleanSummary);
+          summary += ". ";
+        }
+        
+        // Add contract benefit if applicable
+        if (newPartner.contract_length === "No contract – cancel anytime") {
+          summary += "With no long-term commitment, you have the flexibility to switch if your needs change. ";
+        }
+        
+        // Add settlement benefit if applicable
+        if (newPartner.settlement_time?.includes("Same day") || newPartner.settlement_time?.includes("Next working day")) {
+          summary += `Funds are settled ${newPartner.settlement_time.toLowerCase()}, ensuring healthy cash flow.`;
+        } else {
+          summary += "Reliable payment processing to keep your business running smoothly.";
+        }
+        
+        setAiSummary(summary);
       } catch (error) {
         console.error("Error generating summary:", error);
-        setAiSummary(getBenefitTagline());
+        setAiSummary(`${newPartner.name} provides competitive rates and professional payment processing solutions tailored to your business needs.`);
       } finally {
         setLoadingSummary(false);
       }
     };
 
     generateSummary();
-  }, [currentPartner?.name, newPartner?.name, monthlySavings, percentageSavings, isSaving]);
+  }, [currentPartner, newPartner]);
 
   if (!currentPartner || !newPartner || !turnover) {
     return null;

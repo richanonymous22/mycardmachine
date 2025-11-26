@@ -166,6 +166,7 @@ const Index = () => {
                 showTurnoverInput={currentPartner?.id !== "custom"}
                 calculationResult={currentCalculation || undefined}
                 variant="current"
+                providers={partners}
               />
               {currentPartner?.id === "custom" && (
                 <CustomProviderForm onUpdate={handleCustomProviderUpdate} />
@@ -182,6 +183,7 @@ const Index = () => {
                 turnover={turnover}
                 calculationResult={newCalculation || undefined}
                 variant="new"
+                providers={partners}
               />
             </div>
           </div>
