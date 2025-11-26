@@ -49,6 +49,12 @@ const providerSchema = z.object({
   chargeback_fee: z.coerce.number().min(0).optional(),
   refund_fee: z.coerce.number().min(0).optional(),
   
+  // Custom fees
+  custom_fees: z.array(z.object({
+    name: z.string().min(1),
+    amount: z.coerce.number().min(0),
+  })).optional(),
+  
   // Documents required
   doc_proof_of_id: z.boolean().default(true),
   doc_proof_of_business: z.boolean().default(true),
@@ -79,6 +85,32 @@ interface ImprovedProviderFormDialogProps {
   onSuccess: () => void;
 }
 
+// Helper function to extract custom fees from fees object
+const extractCustomFees = (fees: any): Array<{ name: string; amount: number }> => {
+  const standardFees = [
+    'transaction_fee', 'monthly_rental', 'maintenance_fee', 'setup_fee',
+    'dashboard_fee', 'pci_fee', 'chargeback_fee', 'refund_fee',
+    'debit', 'credit', 'blended_rate', 'business_card', 'tap_fee', 
+    'sim_fee', 'min_monthly_charge', 'non_compliance_fee'
+  ];
+  
+  const customFees: Array<{ name: string; amount: number }> = [];
+  
+  if (fees && typeof fees === 'object') {
+    Object.keys(fees).forEach(key => {
+      if (!standardFees.includes(key) && typeof fees[key] === 'number') {
+        // Convert snake_case to Title Case for display
+        const name = key.split('_').map(word => 
+          word.charAt(0).toUpperCase() + word.slice(1)
+        ).join(' ');
+        customFees.push({ name, amount: fees[key] });
+      }
+    });
+  }
+  
+  return customFees;
+};
+
 export const ImprovedProviderFormDialog = ({
   open,
   onOpenChange,
@@ -102,7 +134,7 @@ export const ImprovedProviderFormDialog = ({
       is_active: provider?.is_active ?? true,
       machine_models: provider?.machine_models?.join(", ") || "",
       features: provider?.features?.join(", ") || "",
-      transaction_fee: provider?.fees?.transaction_fee || 0,
+      transaction_fee: provider?.fees?.transaction_fee ? provider.fees.transaction_fee * 100 : 0,
       monthly_rental: provider?.fees?.monthly_rental || 0,
       maintenance_fee: provider?.fees?.maintenance_fee || 0,
       setup_fee: provider?.fees?.setup_fee || 0,
@@ -110,6 +142,7 @@ export const ImprovedProviderFormDialog = ({
       pci_fee: provider?.fees?.pci_fee || 0,
       chargeback_fee: provider?.fees?.chargeback_fee || 0,
       refund_fee: provider?.fees?.refund_fee || 0,
+      custom_fees: provider?.fees ? extractCustomFees(provider.fees) : [],
       doc_proof_of_id: provider?.documents_required?.proof_of_id ?? true,
       doc_proof_of_business: provider?.documents_required?.proof_of_business ?? true,
       doc_proof_of_bank: provider?.documents_required?.proof_of_bank ?? true,
@@ -129,6 +162,11 @@ export const ImprovedProviderFormDialog = ({
     name: "devices",
   });
 
+  const { fields: customFeeFields, append: appendCustomFee, remove: removeCustomFee } = useFieldArray({
+    control: form.control,
+    name: "custom_fees",
+  });
+
   useEffect(() => {
     if (provider && open) {
       form.reset({
@@ -143,7 +181,7 @@ export const ImprovedProviderFormDialog = ({
         is_active: provider.is_active,
         machine_models: provider.machine_models?.join(", ") || "",
         features: provider.features?.join(", ") || "",
-        transaction_fee: provider.fees?.transaction_fee || 0,
+        transaction_fee: provider.fees?.transaction_fee ? provider.fees.transaction_fee * 100 : 0,
         monthly_rental: provider.fees?.monthly_rental || 0,
         maintenance_fee: provider.fees?.maintenance_fee || 0,
         setup_fee: provider.fees?.setup_fee || 0,
@@ -151,12 +189,16 @@ export const ImprovedProviderFormDialog = ({
         pci_fee: provider.fees?.pci_fee || 0,
         chargeback_fee: provider.fees?.chargeback_fee || 0,
         refund_fee: provider.fees?.refund_fee || 0,
+        custom_fees: extractCustomFees(provider.fees),
         doc_proof_of_id: provider.documents_required?.proof_of_id ?? true,
         doc_proof_of_business: provider.documents_required?.proof_of_business ?? true,
         doc_proof_of_bank: provider.documents_required?.proof_of_bank ?? true,
         doc_proof_of_address: provider.documents_required?.proof_of_address ?? true,
         devices: provider.device_info ? (Array.isArray(provider.device_info) ? provider.device_info : [provider.device_info]) : [],
-        turnover_tiers: provider.turnover_tiers || [],
+        turnover_tiers: provider.turnover_tiers ? provider.turnover_tiers.map(tier => ({
+          ...tier,
+          fee: tier.fee * 100 // Convert decimal to % for display
+        })) : [],
       });
     }
   }, [provider, open, form]);
@@ -169,7 +211,7 @@ export const ImprovedProviderFormDialog = ({
 
       // Build fees object matching Partner type structure
       const fees: any = {};
-      if (data.transaction_fee) fees.transaction_fee = data.transaction_fee / 100; // Convert to decimal
+      if (data.transaction_fee) fees.transaction_fee = data.transaction_fee / 100; // Convert % to decimal
       if (data.monthly_rental) fees.monthly_rental = data.monthly_rental;
       if (data.maintenance_fee) fees.maintenance_fee = data.maintenance_fee;
       if (data.setup_fee) fees.setup_fee = data.setup_fee;
@@ -177,6 +219,15 @@ export const ImprovedProviderFormDialog = ({
       if (data.pci_fee) fees.pci_fee = data.pci_fee;
       if (data.chargeback_fee) fees.chargeback_fee = data.chargeback_fee;
       if (data.refund_fee) fees.refund_fee = data.refund_fee;
+      
+      // Add custom fees
+      if (data.custom_fees && data.custom_fees.length > 0) {
+        data.custom_fees.forEach(cf => {
+          if (cf.name && cf.amount) {
+            fees[cf.name.toLowerCase().replace(/\s+/g, '_')] = cf.amount;
+          }
+        });
+      }
 
       const documents_required = {
         proof_of_id: data.doc_proof_of_id,
@@ -191,7 +242,7 @@ export const ImprovedProviderFormDialog = ({
       const turnover_tiers = data.turnover_tiers && data.turnover_tiers.length > 0 
         ? data.turnover_tiers.map(tier => ({
             range: tier.range,
-            fee: tier.fee / 100, // Convert to decimal
+            fee: tier.fee / 100, // Convert % to decimal
             eligible: tier.eligible
           }))
         : null;
@@ -401,7 +452,7 @@ export const ImprovedProviderFormDialog = ({
             {/* Fee Structure */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold">Fee Structure</h3>
-              <p className="text-sm text-muted-foreground">Enter percentage fees as whole numbers (e.g., 1.69 for 1.69%)</p>
+              <p className="text-sm text-muted-foreground">Enter percentage fees as numbers (e.g., enter 1.69 for 1.69% transaction fee)</p>
               
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 <FormField
@@ -516,6 +567,69 @@ export const ImprovedProviderFormDialog = ({
                     </FormItem>
                   )}
                 />
+              </div>
+
+              {/* Custom Fees */}
+              <div className="space-y-3 mt-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="text-sm font-semibold">Custom Fees (Optional)</h4>
+                    <p className="text-xs text-muted-foreground">Add any additional fees not listed above</p>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => appendCustomFee({ name: "", amount: 0 })}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Fee
+                  </Button>
+                </div>
+
+                {customFeeFields.map((field, index) => (
+                  <div key={field.id} className="flex gap-3 items-start p-3 border rounded-lg bg-muted/30">
+                    <div className="grid grid-cols-2 gap-3 flex-1">
+                      <FormField
+                        control={form.control}
+                        name={`custom_fees.${index}.name`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-xs">Fee Name</FormLabel>
+                            <FormControl>
+                              <Input {...field} placeholder="e.g., SIM Fee, Paper Roll Fee" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name={`custom_fees.${index}.amount`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-xs">Amount (£)</FormLabel>
+                            <FormControl>
+                              <Input type="number" step="0.01" {...field} placeholder="0.00" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="mt-6"
+                      onClick={() => removeCustomFee(index)}
+                    >
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </div>
+                ))}
               </div>
             </div>
 
