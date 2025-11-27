@@ -3,6 +3,15 @@ import { Star, TrendingUp, Users, Award, Quote } from "lucide-react";
 import sarahMitchell from "@/assets/testimonials/sarah-mitchell.jpg";
 import jamesPatterson from "@/assets/testimonials/james-patterson.jpg";
 import emmaThompson from "@/assets/testimonials/emma-thompson.jpg";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import Autoplay from "embla-carousel-autoplay";
+import { useRef } from "react";
 
 const stats = [
   {
@@ -60,6 +69,10 @@ const testimonials = [
 ];
 
 export const SocialProof = () => {
+  const plugin = useRef(
+    Autoplay({ delay: 5000, stopOnInteraction: true })
+  );
+
   return (
     <section className="py-12 md:py-20 relative overflow-hidden">
       {/* Subtle Grid Pattern */}
@@ -120,54 +133,64 @@ export const SocialProof = () => {
           ))}
         </div>
 
-        {/* Testimonials Bento Grid */}
-        <div className="grid md:grid-cols-3 gap-6 md:gap-8">
-          {testimonials.map((testimonial, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.15 }}
-              whileHover={{ y: -8 }}
-              className="glass relative group rounded-2xl border border-border/50 hover:border-primary/30 transition-all duration-300 p-6 md:p-8"
-            >
-              {/* Quote Icon */}
-              <div className="absolute top-6 right-6 opacity-10 group-hover:opacity-20 transition-opacity">
-                <Quote className="w-16 h-16 text-primary" />
-              </div>
-
-              {/* Rating */}
-              <div className="flex gap-1 mb-4">
-                {[...Array(testimonial.rating)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 fill-accent text-accent" />
-                ))}
-              </div>
-
-              {/* Content */}
-              <p className="text-muted-foreground leading-relaxed mb-6 relative z-10">
-                "{testimonial.content}"
-              </p>
-
-              {/* Author */}
-              <div className="flex items-center gap-4">
-                <img 
-                  src={testimonial.image} 
-                  alt={testimonial.name}
-                  className="w-12 h-12 rounded-full object-cover ring-2 ring-primary/20"
-                />
-                <div>
-                  <div className="font-semibold text-foreground">
-                    {testimonial.name}
+        {/* Testimonials Carousel */}
+        <Carousel
+          plugins={[plugin.current]}
+          className="w-full max-w-5xl mx-auto"
+          onMouseEnter={plugin.current.stop}
+          onMouseLeave={plugin.current.reset}
+        >
+          <CarouselContent>
+            {testimonials.map((testimonial, index) => (
+              <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: index * 0.15 }}
+                  whileHover={{ y: -8 }}
+                  className="glass relative group rounded-2xl border border-border/50 hover:border-primary/30 transition-all duration-300 p-6 md:p-8 h-full"
+                >
+                  {/* Quote Icon */}
+                  <div className="absolute top-6 right-6 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <Quote className="w-16 h-16 text-primary" />
                   </div>
-                  <div className="text-sm text-muted-foreground">
-                    {testimonial.role}
+
+                  {/* Rating */}
+                  <div className="flex gap-1 mb-4">
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <Star key={i} className="w-4 h-4 fill-accent text-accent" />
+                    ))}
                   </div>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+
+                  {/* Content */}
+                  <p className="text-muted-foreground leading-relaxed mb-6 relative z-10">
+                    "{testimonial.content}"
+                  </p>
+
+                  {/* Author */}
+                  <div className="flex items-center gap-4">
+                    <img 
+                      src={testimonial.image} 
+                      alt={testimonial.name}
+                      className="w-12 h-12 rounded-full object-cover ring-2 ring-primary/20"
+                    />
+                    <div>
+                      <div className="font-semibold text-foreground">
+                        {testimonial.name}
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        {testimonial.role}
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          <CarouselPrevious className="hidden md:flex" />
+          <CarouselNext className="hidden md:flex" />
+        </Carousel>
 
         {/* Trust Badges */}
         <motion.div

@@ -22,8 +22,8 @@ export const Navigation = () => {
     name: "Compare",
     path: "/#calculator"
   }, {
-    name: "V2",
-    path: "/v2"
+    name: "How it Works",
+    path: "/#how-it-works"
   }];
   return <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? "bg-card/80 backdrop-blur-xl border-b border-border shadow-lg" : "bg-card/60 backdrop-blur-md"}`}>
       <div className="container mx-auto px-4">

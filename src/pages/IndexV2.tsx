@@ -14,6 +14,7 @@ import { HowItWorks } from "@/components/HowItWorks";
 import { SocialProof } from "@/components/SocialProof";
 import { FAQ } from "@/components/FAQ";
 import { CTASection } from "@/components/CTASection";
+import { PartnersSection } from "@/components/PartnersSection";
 import { TrendingUp, Sparkles, ChevronDown } from "lucide-react";
 const IndexV2 = () => {
   const [turnover, setTurnover] = useState<number>(0);
@@ -185,6 +186,7 @@ const IndexV2 = () => {
 
       <HowItWorks />
       <SocialProof />
+      <PartnersSection />
       <FAQ />
 
       {/* CTA Section - Always visible */}
