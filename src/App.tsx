@@ -21,9 +21,12 @@ import PriorityRulesManagement from "./pages/admin/PriorityRulesManagement";
 import ApplicationsManagement from "./pages/admin/ApplicationsManagement";
 import CallbacksManagement from "./pages/admin/CallbacksManagement";
 import BlogManagement from "./pages/admin/BlogManagement";
-
+import BlogEditor from "./pages/admin/BlogEditor";
+import BlogManagement from "./pages/admin/BlogManagement";
+import BlogEditor from "./pages/admin/BlogEditor";
+ 
 const queryClient = new QueryClient();
-
+ 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -50,6 +53,8 @@ const App = () => (
           <Route path="/admin/applications" element={<ApplicationsManagement />} />
           <Route path="/admin/callbacks" element={<CallbacksManagement />} />
           <Route path="/admin/blog" element={<BlogManagement />} />
+          <Route path="/admin/blog/new" element={<BlogEditor />} />
+          <Route path="/admin/blog/:id/edit" element={<BlogEditor />} />
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
@@ -58,5 +63,5 @@ const App = () => (
     </TooltipProvider>
   </QueryClientProvider>
 );
-
+ 
 export default App;

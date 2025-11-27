@@ -39,17 +39,21 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
 
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({
+        heading: {
+          levels: [1, 2, 3],
+        },
+      }),
       Underline,
       Image.configure({
         HTMLAttributes: {
-          class: 'max-w-full h-auto rounded-lg my-4',
+          class: "max-w-full h-auto rounded-lg my-4",
         },
       }),
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
-          class: 'text-primary underline',
+          class: "text-primary underline",
         },
       }),
     ],
@@ -59,7 +63,8 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
     },
     editorProps: {
       attributes: {
-        class: 'prose prose-sm dark:prose-invert max-w-none min-h-[400px] p-4 focus:outline-none',
+        class:
+          "prose prose-base md:prose-lg dark:prose-invert max-w-none min-h-[500px] p-4 focus:outline-none",
       },
     },
   });
