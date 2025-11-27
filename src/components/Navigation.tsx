@@ -35,11 +35,11 @@ export const Navigation = () => {
           }} whileTap={{
             scale: 0.95
           }} className="flex items-center gap-3">
-              <div className="relative w-10 h-10 md:w-12 md:h-12">
+              <div className="relative w-12 h-12 md:w-14 md:h-14">
                 <img src={logo} alt="My Card Machine" className="w-full h-full object-contain" />
               </div>
               <div className="flex flex-col">
-                <span className="text-base text-foreground leading-tight text-left md:text-lg font-bold font-sans">
+                <span className="text-lg text-foreground leading-tight text-left md:text-xl font-bold font-sans">
                   My Card Machine
                 </span>
                 
@@ -49,14 +49,39 @@ export const Navigation = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
-            {navLinks.map(link => <Link key={link.path} to={link.path} className={`relative text-sm font-medium transition-colors hover:text-primary ${location.pathname === link.path ? "text-primary" : "text-foreground/70"}`}>
-                {link.name}
-                {location.pathname === link.path && <motion.div layoutId="navbar-indicator" className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary" transition={{
-              type: "spring",
-              stiffness: 380,
-              damping: 30
-            }} />}
-              </Link>)}
+            <button 
+              onClick={() => {
+                const element = document.getElementById('calculator-section');
+                element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }}
+              className="relative text-sm font-medium text-foreground/70 transition-colors hover:text-primary"
+            >
+              Calculator
+            </button>
+            <button 
+              onClick={() => {
+                const element = document.getElementById('how-it-works');
+                element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }}
+              className="relative text-sm font-medium text-foreground/70 transition-colors hover:text-primary"
+            >
+              How It Works
+            </button>
+            <button 
+              onClick={() => {
+                const testimonials = document.querySelector('[class*="animate-testimonial-scroll"]');
+                testimonials?.parentElement?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              }}
+              className="relative text-sm font-medium text-foreground/70 transition-colors hover:text-primary"
+            >
+              Testimonials
+            </button>
+            <Link 
+              to="/v1"
+              className="relative text-sm font-medium text-foreground/70 transition-colors hover:text-primary"
+            >
+              Classic View
+            </Link>
           </div>
 
           {/* CTA Buttons - Desktop */}
