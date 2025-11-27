@@ -133,12 +133,14 @@ export const SocialProof = () => {
           ))}
         </div>
 
-        {/* Testimonials Carousel */}
+        {/* Testimonials Grid with Auto-Rotation */}
         <Carousel
           plugins={[plugin.current]}
           className="w-full max-w-5xl mx-auto"
-          onMouseEnter={plugin.current.stop}
-          onMouseLeave={plugin.current.reset}
+          opts={{
+            align: "start",
+            loop: true,
+          }}
         >
           <CarouselContent>
             {testimonials.map((testimonial, index) => (
@@ -188,8 +190,6 @@ export const SocialProof = () => {
               </CarouselItem>
             ))}
           </CarouselContent>
-          <CarouselPrevious className="hidden md:flex" />
-          <CarouselNext className="hidden md:flex" />
         </Carousel>
 
         {/* Trust Badges */}
