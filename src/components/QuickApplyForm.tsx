@@ -51,9 +51,8 @@ export const QuickApplyForm = ({ partner, costs, monthlyTurnover, onBack, onSucc
   const onSubmitPersonalInfo = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
     try {
-      const { data, error } = await supabase
-        .from("applications")
-        .insert({
+      const { data, error } = await supabase.functions.invoke("create-application", {
+        body: {
           partner_id: partner.id,
           partner_name: partner.name,
           name: values.name,
@@ -62,11 +61,13 @@ export const QuickApplyForm = ({ partner, costs, monthlyTurnover, onBack, onSucc
           monthly_turnover: monthlyTurnover,
           estimated_monthly_cost: costs.totalMonthlyCost,
           estimated_annual_savings: costs.annualCost,
-        })
-        .select()
-        .single();
+        },
+      });
 
       if (error) throw error;
+      if (!data || typeof data.id !== "string") {
+        throw new Error("Invalid response from application service");
+      }
 
       setApplicationId(data.id);
       setCurrentStep(2);

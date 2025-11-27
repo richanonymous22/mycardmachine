@@ -63,9 +63,8 @@ const Apply = () => {
     
     setIsSubmitting(true);
     try {
-      const { data, error } = await supabase
-        .from("applications")
-        .insert({
+      const { data, error } = await supabase.functions.invoke("create-application", {
+        body: {
           partner_id: partner.id,
           partner_name: partner.name,
           name: values.name,
@@ -74,11 +73,13 @@ const Apply = () => {
           monthly_turnover: monthlyTurnover,
           estimated_monthly_cost: estimatedCost,
           estimated_annual_savings: estimatedSavings,
-        })
-        .select()
-        .single();
+        },
+      });
 
       if (error) throw error;
+      if (!data || typeof data.id !== "string") {
+        throw new Error("Invalid response from application service");
+      }
 
       setApplicationId(data.id);
       setCurrentStep(2);
