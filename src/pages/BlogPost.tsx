@@ -5,8 +5,9 @@ import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { motion } from "framer-motion";
-import { Calendar, ArrowLeft } from "lucide-react";
+import { Calendar, ArrowLeft, ArrowRight } from "lucide-react";
 import { format } from "date-fns";
 import { Helmet } from "react-helmet";
 
@@ -26,6 +27,30 @@ const BlogPost = () => {
       if (error) throw error;
       return data;
     },
+  });
+
+  const { data: relatedPosts } = useQuery({
+    queryKey: ["related-blog-posts", slug, post?.tags],
+    queryFn: async () => {
+      if (!post?.tags || post.tags.length === 0) {
+        return [];
+      }
+
+      const primaryTag = post.tags[0];
+
+      const { data, error } = await supabase
+        .from("blog_posts")
+        .select("*")
+        .eq("status", "published")
+        .contains("tags", [primaryTag])
+        .neq("slug", slug)
+        .order("published_at", { ascending: false })
+        .limit(3);
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!post && !!post.tags && post.tags.length > 0,
   });
 
   if (isLoading) {
@@ -154,6 +179,34 @@ const BlogPost = () => {
                 prose-img:rounded-lg prose-img:shadow-md prose-img:my-6"
               dangerouslySetInnerHTML={{ __html: post.content }}
             />
+
+            {relatedPosts && relatedPosts.length > 0 && (
+              <section className="mt-12 border-top border-border pt-8">
+                <h2 className="text-2xl font-semibold mb-4">Related articles</h2>
+                <div className="grid gap-4 md:grid-cols-3">
+                  {relatedPosts.map((related: any) => (
+                    <Link key={related.id} to={`/blog/${related.slug}`}>
+                      <Card className="h-full hover:shadow-lg transition-shadow">
+                        <CardContent className="p-4">
+                          <p className="text-sm text-muted-foreground mb-1">
+                            {related.published_at
+                              ? format(new Date(related.published_at), "MMM d, yyyy")
+                              : ""}
+                          </p>
+                          <h3 className="font-semibold mb-2 line-clamp-2">
+                            {related.title}
+                          </h3>
+                          <div className="flex items-center text-sm text-primary font-medium">
+                            Read article
+                            <ArrowRight className="w-4 h-4 ml-1" />
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            )}
           </motion.div>
         </article>
       </main>
