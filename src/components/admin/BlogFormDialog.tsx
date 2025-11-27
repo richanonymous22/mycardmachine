@@ -22,6 +22,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { RichTextEditor } from "@/components/admin/RichTextEditor";
 import {
   Select,
   SelectContent,
@@ -231,11 +232,14 @@ export function BlogFormDialog({ open, onOpenChange, editingPost }: BlogFormDial
               name="content"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Content (HTML)</FormLabel>
+                  <FormLabel>Content</FormLabel>
                   <FormControl>
-                    <Textarea {...field} placeholder="Enter post content (HTML supported)" rows={12} />
+                    <RichTextEditor
+                      content={field.value}
+                      onChange={field.onChange}
+                    />
                   </FormControl>
-                  <FormDescription>You can use HTML tags for formatting</FormDescription>
+                  <FormDescription>Use the toolbar to format your content</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

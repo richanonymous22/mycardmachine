@@ -130,7 +130,7 @@ const BlogPost = () => {
             </div>
 
             {post.featured_image_url && (
-              <div className="aspect-video overflow-hidden rounded-lg mb-8">
+              <div className="aspect-video overflow-hidden rounded-lg mb-8 shadow-lg">
                 <img
                   src={post.featured_image_url}
                   alt={post.title}
@@ -140,7 +140,18 @@ const BlogPost = () => {
             )}
 
             <div
-              className="prose prose-lg dark:prose-invert max-w-none"
+              className="prose prose-lg dark:prose-invert max-w-none
+                prose-headings:font-bold prose-headings:text-foreground
+                prose-h1:text-4xl prose-h1:mb-6 prose-h1:mt-8
+                prose-h2:text-3xl prose-h2:mb-4 prose-h2:mt-6
+                prose-h3:text-2xl prose-h3:mb-3 prose-h3:mt-5
+                prose-p:text-muted-foreground prose-p:leading-relaxed prose-p:mb-4
+                prose-a:text-primary prose-a:no-underline hover:prose-a:underline
+                prose-strong:text-foreground prose-strong:font-semibold
+                prose-ul:my-4 prose-ol:my-4 prose-li:my-2
+                prose-blockquote:border-l-4 prose-blockquote:border-primary 
+                prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-muted-foreground
+                prose-img:rounded-lg prose-img:shadow-md prose-img:my-6"
               dangerouslySetInnerHTML={{ __html: post.content }}
             />
           </motion.div>
