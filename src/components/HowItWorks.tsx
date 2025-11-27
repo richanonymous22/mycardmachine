@@ -34,7 +34,7 @@ const steps = [
 
 export const HowItWorks = () => {
   return (
-    <section className="py-12 md:py-20 relative overflow-hidden">
+    <section id="how-it-works" className="py-12 md:py-20 relative overflow-hidden">
       {/* Subtle Grid Pattern */}
       <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:30px_30px]" />
 
