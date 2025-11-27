@@ -55,7 +55,6 @@ const convertProviderToPartner = (provider: ProviderRow): Partner => {
     features: provider.features,
     device_info: provider.device_info,
     documents_required: provider.documents_required,
-    logo_url: provider.logo_url,
   };
 };
 

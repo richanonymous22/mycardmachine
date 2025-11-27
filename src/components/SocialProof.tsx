@@ -120,80 +120,54 @@ export const SocialProof = () => {
           ))}
         </div>
 
-        {/* Testimonials - Smooth Infinite Scroll */}
-        <div className="relative overflow-hidden max-w-6xl mx-auto">
-          <div className="flex gap-6 animate-testimonial-scroll">
-            {/* Triple the testimonials for seamless loop */}
-            {[...testimonials, ...testimonials, ...testimonials].map((testimonial, index) => (
-              <motion.div
-                key={`testimonial-${index}`}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: (index % testimonials.length) * 0.15 }}
-                className="glass relative group rounded-2xl border border-border/50 hover:border-primary/30 transition-all duration-300 p-6 md:p-8 flex-shrink-0 w-[320px] md:w-[380px]"
-              >
-                {/* Quote Icon */}
-                <div className="absolute top-6 right-6 opacity-10 group-hover:opacity-20 transition-opacity">
-                  <Quote className="w-16 h-16 text-primary" />
-                </div>
+        {/* Testimonials Bento Grid */}
+        <div className="grid md:grid-cols-3 gap-6 md:gap-8">
+          {testimonials.map((testimonial, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: index * 0.15 }}
+              whileHover={{ y: -8 }}
+              className="glass relative group rounded-2xl border border-border/50 hover:border-primary/30 transition-all duration-300 p-6 md:p-8"
+            >
+              {/* Quote Icon */}
+              <div className="absolute top-6 right-6 opacity-10 group-hover:opacity-20 transition-opacity">
+                <Quote className="w-16 h-16 text-primary" />
+              </div>
 
-                {/* Rating */}
-                <div className="flex gap-1 mb-4">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-accent text-accent" />
-                  ))}
-                </div>
+              {/* Rating */}
+              <div className="flex gap-1 mb-4">
+                {[...Array(testimonial.rating)].map((_, i) => (
+                  <Star key={i} className="w-4 h-4 fill-accent text-accent" />
+                ))}
+              </div>
 
-                {/* Content */}
-                <p className="text-muted-foreground leading-relaxed mb-6 relative z-10 min-h-[120px]">
-                  "{testimonial.content}"
-                </p>
+              {/* Content */}
+              <p className="text-muted-foreground leading-relaxed mb-6 relative z-10">
+                "{testimonial.content}"
+              </p>
 
-                {/* Author */}
-                <div className="flex items-center gap-4">
-                  <img 
-                    src={testimonial.image} 
-                    alt={testimonial.name}
-                    className="w-12 h-12 rounded-full object-cover ring-2 ring-primary/20"
-                  />
-                  <div>
-                    <div className="font-semibold text-foreground">
-                      {testimonial.name}
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      {testimonial.role}
-                    </div>
+              {/* Author */}
+              <div className="flex items-center gap-4">
+                <img 
+                  src={testimonial.image} 
+                  alt={testimonial.name}
+                  className="w-12 h-12 rounded-full object-cover ring-2 ring-primary/20"
+                />
+                <div>
+                  <div className="font-semibold text-foreground">
+                    {testimonial.name}
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    {testimonial.role}
                   </div>
                 </div>
-              </motion.div>
-            ))}
-          </div>
-          
-          {/* Gradient overlays */}
-          <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-background via-background/90 to-transparent pointer-events-none" />
-          <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-background via-background/90 to-transparent pointer-events-none" />
+              </div>
+            </motion.div>
+          ))}
         </div>
-
-        <style>{`
-          @keyframes testimonial-scroll {
-            0% {
-              transform: translateX(0);
-            }
-            100% {
-              transform: translateX(-33.333%);
-            }
-          }
-          
-          .animate-testimonial-scroll {
-            animation: testimonial-scroll 45s linear infinite;
-            will-change: transform;
-          }
-          
-          .animate-testimonial-scroll:hover {
-            animation-play-state: paused;
-          }
-        `}</style>
 
         {/* Trust Badges */}
         <motion.div

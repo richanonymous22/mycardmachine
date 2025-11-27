@@ -104,18 +104,3 @@
     @apply focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background;
   }
 }
-
-@layer utilities {
-  @keyframes bounce-horizontal {
-    0%, 100% {
-      transform: translateX(0);
-    }
-    50% {
-      transform: translateX(-10px);
-    }
-  }
-
-  .animate-bounce-horizontal {
-    animation: bounce-horizontal 2s ease-in-out infinite;
-  }
-}

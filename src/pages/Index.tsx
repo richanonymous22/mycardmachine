@@ -11,7 +11,6 @@ import { SocialProof } from "@/components/SocialProof";
 import { FAQ } from "@/components/FAQ";
 import { CustomProviderForm, CustomProviderData } from "@/components/CustomProviderForm";
 import { GetStartedCard } from "@/components/GetStartedCard";
-import { PartnersSection } from "@/components/PartnersSection";
 import { useProviders, useProviderOffers, usePriorityRules } from "@/hooks/useProviders";
 import { calculateMerchantCosts } from "@/utils/calculations";
 import { Partner } from "@/types/merchant";
@@ -242,7 +241,6 @@ const Index = () => {
 
       <HowItWorks />
       <SocialProof />
-      <PartnersSection />
       <FAQ />
       
       <div className="mt-8 md:mt-10">

@@ -22,8 +22,8 @@ export const Navigation = () => {
     name: "Compare",
     path: "/#calculator"
   }, {
-    name: "How it Works",
-    path: "/#how-it-works"
+    name: "V2",
+    path: "/v2"
   }];
   return <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? "bg-card/80 backdrop-blur-xl border-b border-border shadow-lg" : "bg-card/60 backdrop-blur-md"}`}>
       <div className="container mx-auto px-4">
@@ -35,11 +35,11 @@ export const Navigation = () => {
           }} whileTap={{
             scale: 0.95
           }} className="flex items-center gap-3">
-              <div className="relative w-12 h-12 md:w-14 md:h-14">
+              <div className="relative w-10 h-10 md:w-12 md:h-12">
                 <img src={logo} alt="My Card Machine" className="w-full h-full object-contain" />
               </div>
               <div className="flex flex-col">
-                <span className="text-lg text-foreground leading-tight text-left md:text-xl font-bold font-sans">
+                <span className="text-base text-foreground leading-tight text-left md:text-lg font-bold font-sans">
                   My Card Machine
                 </span>
                 
@@ -49,39 +49,14 @@ export const Navigation = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
-            <button 
-              onClick={() => {
-                const element = document.getElementById('calculator-section');
-                element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-              }}
-              className="relative text-sm font-medium text-foreground/70 transition-colors hover:text-primary"
-            >
-              Calculator
-            </button>
-            <button 
-              onClick={() => {
-                const element = document.getElementById('how-it-works');
-                element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-              }}
-              className="relative text-sm font-medium text-foreground/70 transition-colors hover:text-primary"
-            >
-              How It Works
-            </button>
-            <button 
-              onClick={() => {
-                const testimonials = document.querySelector('[class*="animate-testimonial-scroll"]');
-                testimonials?.parentElement?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-              }}
-              className="relative text-sm font-medium text-foreground/70 transition-colors hover:text-primary"
-            >
-              Testimonials
-            </button>
-            <Link 
-              to="/v1"
-              className="relative text-sm font-medium text-foreground/70 transition-colors hover:text-primary"
-            >
-              Classic View
-            </Link>
+            {navLinks.map(link => <Link key={link.path} to={link.path} className={`relative text-sm font-medium transition-colors hover:text-primary ${location.pathname === link.path ? "text-primary" : "text-foreground/70"}`}>
+                {link.name}
+                {location.pathname === link.path && <motion.div layoutId="navbar-indicator" className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary" transition={{
+              type: "spring",
+              stiffness: 380,
+              damping: 30
+            }} />}
+              </Link>)}
           </div>
 
           {/* CTA Buttons - Desktop */}

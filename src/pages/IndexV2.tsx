@@ -14,7 +14,6 @@ import { HowItWorks } from "@/components/HowItWorks";
 import { SocialProof } from "@/components/SocialProof";
 import { FAQ } from "@/components/FAQ";
 import { CTASection } from "@/components/CTASection";
-import { PartnersSection } from "@/components/PartnersSection";
 import { TrendingUp, Sparkles, ChevronDown } from "lucide-react";
 const IndexV2 = () => {
   const [turnover, setTurnover] = useState<number>(0);
@@ -123,7 +122,7 @@ const IndexV2 = () => {
               </div>
             </div>
             
-            {/* Input Section with Animated Indicator */}
+            {/* Input Section */}
             <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700" style={{ animationDelay: '150ms' }}>
               <Label htmlFor="turnover-v2" className="text-base md:text-lg font-semibold text-center block text-foreground/90">
                 Monthly Card Turnover
@@ -131,16 +130,6 @@ const IndexV2 = () => {
               <div className="relative group">
                 {/* Glow effect on focus */}
                 <div className="absolute -inset-1 bg-gradient-to-r from-primary/50 to-accent/50 rounded-xl opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 blur transition-opacity duration-300" />
-                
-                {/* Animated pointer indicator */}
-                {turnover === 0 && (
-                  <div className="absolute -right-16 md:-right-20 top-1/2 -translate-y-1/2 animate-bounce-horizontal">
-                    <div className="flex items-center gap-2 text-primary">
-                      <div className="text-2xl md:text-3xl">👈</div>
-                      <span className="hidden lg:block text-sm font-medium whitespace-nowrap">Type here!</span>
-                    </div>
-                  </div>
-                )}
                 
                 <div className="relative">
                   <span className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 text-primary text-xl md:text-3xl font-bold z-10">
@@ -196,7 +185,6 @@ const IndexV2 = () => {
 
       <HowItWorks />
       <SocialProof />
-      <PartnersSection />
       <FAQ />
 
       {/* CTA Section - Always visible */}

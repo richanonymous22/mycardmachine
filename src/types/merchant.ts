@@ -1,7 +1,6 @@
 export interface Partner {
   id: string;
   name: string;
-  logo_url?: string | null;
   machine_models?: string[];
   contract_length?: string;
   settlement_time?: string;
