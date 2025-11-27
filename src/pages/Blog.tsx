@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
@@ -13,6 +14,7 @@ import { format } from "date-fns";
 
 const Blog = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [activeTag, setActiveTag] = useState<string | null>(null);
 
   const { data: posts, isLoading } = useQuery({
     queryKey: ["blog-posts", searchQuery],
@@ -32,6 +34,21 @@ const Blog = () => {
       return data;
     },
   });
+
+  const allTags = useMemo(() => {
+    if (!posts) return [] as string[];
+    const tagSet = new Set<string>();
+    posts.forEach((post: any) => {
+      post.tags?.forEach((tag: string) => tagSet.add(tag));
+    });
+    return Array.from(tagSet);
+  }, [posts]);
+
+  const filteredPosts = useMemo(() => {
+    if (!posts) return [] as any[];
+    if (!activeTag) return posts;
+    return posts.filter((post: any) => post.tags?.includes(activeTag));
+  }, [posts, activeTag]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -65,6 +82,29 @@ const Blog = () => {
             </div>
           </motion.div>
 
+          {/* Category filter */}
+          {!isLoading && posts && posts.length > 0 && allTags.length > 0 && (
+            <div className="mb-8 flex flex-wrap justify-center gap-3">
+              <Button
+                size="sm"
+                variant={activeTag === null ? "default" : "outline"}
+                onClick={() => setActiveTag(null)}
+              >
+                All
+              </Button>
+              {allTags.map((tag) => (
+                <Button
+                  key={tag}
+                  size="sm"
+                  variant={activeTag === tag ? "default" : "outline"}
+                  onClick={() => setActiveTag(tag)}
+                >
+                  {tag}
+                </Button>
+              ))}
+            </div>
+          )}
+
           {/* Blog Posts Grid */}
           {isLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -79,13 +119,13 @@ const Blog = () => {
                 </Card>
               ))}
             </div>
-          ) : posts && posts.length > 0 ? (
+          ) : filteredPosts && filteredPosts.length > 0 ? (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
             >
-              {posts.map((post, index) => (
+              {filteredPosts.map((post, index) => (
                 <motion.div
                   key={post.id}
                   initial={{ opacity: 0, y: 20 }}
@@ -144,8 +184,8 @@ const Blog = () => {
           ) : (
             <div className="text-center py-16">
               <p className="text-muted-foreground text-lg">
-                {searchQuery
-                  ? "No articles found matching your search."
+                {searchQuery || activeTag
+                  ? "No articles found matching your current filters."
                   : "No blog posts published yet."}
               </p>
             </div>

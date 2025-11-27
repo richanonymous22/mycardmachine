@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState, type ChangeEvent } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -76,6 +76,49 @@ export function BlogFormDialog({ open, onOpenChange, editingPost }: BlogFormDial
       tags: "",
     },
   });
+
+  const [isUploadingFeaturedImage, setIsUploadingFeaturedImage] = useState(false);
+
+  const handleFeaturedImageUpload = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingFeaturedImage(true);
+    try {
+      const fileExt = file.name.split(".").pop();
+      const fileName = `featured-${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
+      const { data, error } = await supabase.storage
+        .from("blog-images")
+        .upload(fileName, file);
+
+      if (error || !data) {
+        throw error || new Error("Failed to upload image");
+      }
+
+      const { data: publicData } = supabase.storage
+        .from("blog-images")
+        .getPublicUrl(data.path);
+
+      const publicUrl = publicData.publicUrl;
+
+      form.setValue("featured_image_url", publicUrl || "", { shouldValidate: true });
+
+      toast({
+        title: "Featured image uploaded",
+        description: "The image has been attached to this post.",
+      });
+    } catch (error: any) {
+      console.error(error);
+      toast({
+        title: "Image upload failed",
+        description: error?.message || "Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploadingFeaturedImage(false);
+      event.target.value = "";
+    }
+  };
 
   useEffect(() => {
     if (editingPost) {
@@ -246,19 +289,30 @@ export function BlogFormDialog({ open, onOpenChange, editingPost }: BlogFormDial
             />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="featured_image_url"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Featured Image URL</FormLabel>
-                    <FormControl>
+            <FormField
+              control={form.control}
+              name="featured_image_url"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Featured Image</FormLabel>
+                  <FormControl>
+                    <div className="space-y-2">
                       <Input {...field} placeholder="https://example.com/image.jpg" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFeaturedImageUpload}
+                        disabled={isUploadingFeaturedImage}
+                      />
+                    </div>
+                  </FormControl>
+                  <FormDescription>
+                    Paste an image URL or upload a file for the blog hero image.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
               <FormField
                 control={form.control}

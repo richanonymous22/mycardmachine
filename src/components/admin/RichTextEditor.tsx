@@ -20,7 +20,9 @@ import {
   ImageIcon,
   Link as LinkIcon,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, type ChangeEvent } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface RichTextEditorProps {
   content: string;
@@ -32,6 +34,8 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
   const [linkUrl, setLinkUrl] = useState('');
   const [showImageInput, setShowImageInput] = useState(false);
   const [showLinkInput, setShowLinkInput] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const { toast } = useToast();
 
   const editor = useEditor({
     extensions: [
@@ -72,6 +76,50 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
     }
   };
 
+  const handleImageFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingImage(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
+
+      const { data, error } = await supabase.storage
+        .from('blog-images')
+        .upload(fileName, file);
+
+      if (error || !data) {
+        throw error || new Error('Failed to upload image');
+      }
+
+      const { data: publicData } = supabase.storage
+        .from('blog-images')
+        .getPublicUrl(data.path);
+
+      const publicUrl = publicData.publicUrl;
+
+      editor.chain().focus().setImage({ src: publicUrl }).run();
+
+      toast({
+        title: 'Image added',
+        description: 'Your image has been uploaded.',
+      });
+
+      setShowImageInput(false);
+    } catch (error: any) {
+      console.error(error);
+      toast({
+        title: 'Image upload failed',
+        description: error?.message || 'Please try again or use an image URL.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsUploadingImage(false);
+      event.target.value = '';
+    }
+  };
+
   const addLink = () => {
     if (linkUrl) {
       editor.chain().focus().setLink({ href: linkUrl }).run();
@@ -79,7 +127,6 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
       setShowLinkInput(false);
     }
   };
-
   return (
     <div className="border rounded-lg overflow-hidden bg-background">
       <div className="border-b bg-muted/30 p-2 flex flex-wrap gap-1">
@@ -205,16 +252,27 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
       </div>
 
       {showImageInput && (
-        <div className="border-b bg-muted/20 p-2 flex gap-2">
+        <div className="border-b bg-muted/20 p-2 flex flex-wrap items-center gap-2">
           <Input
             placeholder="Enter image URL"
             value={imageUrl}
             onChange={(e) => setImageUrl(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && addImage()}
+            className="flex-1 min-w-[200px]"
           />
           <Button type="button" onClick={addImage} size="sm">
-            Add
+            Add URL
           </Button>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground">or upload</span>
+            <Input
+              type="file"
+              accept="image/*"
+              onChange={handleImageFileChange}
+              disabled={isUploadingImage}
+              className="max-w-[220px]"
+            />
+          </div>
           <Button
             type="button"
             onClick={() => setShowImageInput(false)}
