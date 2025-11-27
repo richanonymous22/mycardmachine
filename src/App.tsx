@@ -11,6 +11,8 @@ import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import Apply from "./pages/Apply";
 import Callback from "./pages/Callback";
+import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import ProvidersManagement from "./pages/admin/ProvidersManagement";
@@ -18,6 +20,7 @@ import OffersManagement from "./pages/admin/OffersManagement";
 import PriorityRulesManagement from "./pages/admin/PriorityRulesManagement";
 import ApplicationsManagement from "./pages/admin/ApplicationsManagement";
 import CallbacksManagement from "./pages/admin/CallbacksManagement";
+import BlogManagement from "./pages/admin/BlogManagement";
 
 const queryClient = new QueryClient();
 
@@ -28,13 +31,15 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/v2" element={<IndexV2 />} />
+          <Route path="/" element={<IndexV2 />} />
+          <Route path="/v1" element={<Index />} />
           <Route path="/apply" element={<Apply />} />
           <Route path="/callback" element={<Callback />} />
           <Route path="/thank-you" element={<ThankYou />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/privacy" element={<Privacy />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:slug" element={<BlogPost />} />
           
           {/* Admin Routes */}
           <Route path="/admin/login" element={<AdminLogin />} />
@@ -44,6 +49,7 @@ const App = () => (
           <Route path="/admin/priority-rules" element={<PriorityRulesManagement />} />
           <Route path="/admin/applications" element={<ApplicationsManagement />} />
           <Route path="/admin/callbacks" element={<CallbacksManagement />} />
+          <Route path="/admin/blog" element={<BlogManagement />} />
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

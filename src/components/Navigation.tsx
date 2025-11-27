@@ -17,14 +17,35 @@ export const Navigation = () => {
   }, []);
   const navLinks = [{
     name: "Home",
-    path: "/"
+    path: "/",
+    hash: ""
   }, {
-    name: "Compare",
-    path: "/#calculator"
+    name: "Calculator",
+    path: "/#calculator",
+    hash: "#calculator"
   }, {
-    name: "V2",
-    path: "/v2"
+    name: "How It Works",
+    path: "/#how-it-works",
+    hash: "#how-it-works"
+  }, {
+    name: "Testimonials",
+    path: "/#testimonials",
+    hash: "#testimonials"
+  }, {
+    name: "Blog",
+    path: "/blog",
+    hash: ""
   }];
+
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, hash: string) => {
+    if (hash && location.pathname === "/") {
+      e.preventDefault();
+      const element = document.querySelector(hash);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+  };
   return <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? "bg-card/80 backdrop-blur-xl border-b border-border shadow-lg" : "bg-card/60 backdrop-blur-md"}`}>
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16 md:h-18">
@@ -49,13 +70,28 @@ export const Navigation = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
-            {navLinks.map(link => <Link key={link.path} to={link.path} className={`relative text-sm font-medium transition-colors hover:text-primary ${location.pathname === link.path ? "text-primary" : "text-foreground/70"}`}>
+            {navLinks.map(link => <Link 
+                key={link.path} 
+                to={link.path} 
+                onClick={(e) => handleNavClick(e, link.hash)}
+                className={`relative text-sm font-medium transition-colors hover:text-primary ${
+                  location.pathname === link.path || (link.hash && location.hash === link.hash) 
+                    ? "text-primary" 
+                    : "text-foreground/70"
+                }`}
+              >
                 {link.name}
-                {location.pathname === link.path && <motion.div layoutId="navbar-indicator" className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary" transition={{
-              type: "spring",
-              stiffness: 380,
-              damping: 30
-            }} />}
+                {(location.pathname === link.path || (link.hash && location.hash === link.hash)) && (
+                  <motion.div 
+                    layoutId="navbar-indicator" 
+                    className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary" 
+                    transition={{
+                      type: "spring",
+                      stiffness: 380,
+                      damping: 30
+                    }} 
+                  />
+                )}
               </Link>)}
           </div>
 
@@ -85,7 +121,19 @@ export const Navigation = () => {
         height: isOpen ? "auto" : 0
       }} className="overflow-hidden md:hidden">
           <div className="py-4 space-y-3 border-t border-border/50">
-            {navLinks.map(link => <Link key={link.path} to={link.path} onClick={() => setIsOpen(false)} className={`block py-2 text-sm font-medium transition-colors ${location.pathname === link.path ? "text-primary" : "text-foreground/70 hover:text-primary"}`}>
+            {navLinks.map(link => <Link 
+                key={link.path} 
+                to={link.path} 
+                onClick={(e) => {
+                  handleNavClick(e, link.hash);
+                  setIsOpen(false);
+                }} 
+                className={`block py-2 text-sm font-medium transition-colors ${
+                  location.pathname === link.path || (link.hash && location.hash === link.hash)
+                    ? "text-primary" 
+                    : "text-foreground/70 hover:text-primary"
+                }`}
+              >
                 {link.name}
               </Link>)}
             <div className="pt-3 space-y-2 border-t border-border/50">
