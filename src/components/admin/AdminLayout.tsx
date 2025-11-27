@@ -9,7 +9,8 @@ import {
   TrendingUp, 
   FileText, 
   Phone,
-  LogOut 
+  LogOut,
+  BookOpen
 } from "lucide-react";
 
 interface AdminLayoutProps {
@@ -33,6 +34,7 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
     { path: "/admin/priority-rules", icon: TrendingUp, label: "Priority Rules" },
     { path: "/admin/applications", icon: FileText, label: "Applications" },
     { path: "/admin/callbacks", icon: Phone, label: "Callbacks" },
+    { path: "/admin/blog", icon: BookOpen, label: "Blog" },
   ];
 
   return (
