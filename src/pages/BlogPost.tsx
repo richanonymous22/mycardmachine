@@ -359,23 +359,7 @@ const BlogPost = () => {
             )}
  
             <div
-              className="prose prose-lg dark:prose-invert max-w-none
-                prose-headings:font-bold prose-headings:text-foreground prose-headings:tracking-tight
-                prose-h1:text-4xl prose-h1:md:text-5xl prose-h1:mb-6 prose-h1:mt-10 prose-h1:leading-tight
-                prose-h2:text-2xl prose-h2:md:text-3xl prose-h2:mb-4 prose-h2:mt-8 prose-h2:leading-snug
-                prose-h3:text-xl prose-h3:md:text-2xl prose-h3:mb-3 prose-h3:mt-6 prose-h3:leading-snug
-                prose-p:text-foreground/80 prose-p:leading-relaxed prose-p:mb-6 prose-p:text-base prose-p:md:text-lg
-                prose-a:text-primary prose-a:underline prose-a:underline-offset-2 hover:prose-a:text-primary/80
-                prose-strong:text-foreground prose-strong:font-semibold
-                prose-ul:my-6 prose-ul:pl-6 prose-ul:list-disc prose-ul:space-y-2
-                prose-ol:my-6 prose-ol:pl-6 prose-ol:list-decimal prose-ol:space-y-2
-                prose-li:text-foreground/80 prose-li:leading-relaxed
-                prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:bg-muted/30
-                prose-blockquote:pl-6 prose-blockquote:py-4 prose-blockquote:pr-4 prose-blockquote:italic 
-                prose-blockquote:text-foreground/70 prose-blockquote:rounded-r-lg prose-blockquote:my-8
-                prose-img:rounded-xl prose-img:shadow-lg prose-img:my-8
-                prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm
-                prose-pre:bg-muted prose-pre:rounded-lg prose-pre:p-4"
+              className="blog-content prose prose-lg prose-invert max-w-none"
               dangerouslySetInnerHTML={{ __html: post.content }}
             />
  
@@ -413,21 +397,30 @@ const BlogPost = () => {
               </form>
  
               {comments && comments.length > 0 ? (
-                <div className="space-y-4">
+                <div className="space-y-6">
                   {comments.map((comment: any) => (
                     <div
                       key={comment.id}
-                      className="rounded-lg border border-border bg-card p-4 space-y-1"
+                      className="flex gap-4"
                     >
-                      <p className="text-sm font-medium text-foreground">
-                        {comment.author_name || "Anonymous"}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {format(new Date(comment.created_at), "MMM d, yyyy 'at' HH:mm")}
-                      </p>
-                      <p className="text-sm text-muted-foreground mt-2">
-                        {comment.content}
-                      </p>
+                      <div className="flex-shrink-0">
+                        <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-semibold text-sm">
+                          {(comment.author_name || "A").charAt(0).toUpperCase()}
+                        </div>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-medium text-foreground">
+                            {comment.author_name || "Anonymous"}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {format(new Date(comment.created_at), "MMM d, yyyy 'at' HH:mm")}
+                          </span>
+                        </div>
+                        <p className="text-muted-foreground leading-relaxed">
+                          {comment.content}
+                        </p>
+                      </div>
                     </div>
                   ))}
                 </div>

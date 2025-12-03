@@ -104,3 +104,56 @@
     @apply focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background;
   }
 }
+
+/* Blog Content Styling */
+.blog-content h1 {
+  @apply text-4xl md:text-5xl font-bold mb-6 mt-10 leading-tight text-foreground;
+}
+
+.blog-content h2 {
+  @apply text-2xl md:text-3xl font-bold mb-4 mt-8 leading-snug text-foreground;
+}
+
+.blog-content h3 {
+  @apply text-xl md:text-2xl font-semibold mb-3 mt-6 leading-snug text-foreground;
+}
+
+.blog-content p {
+  @apply text-base md:text-lg leading-relaxed mb-6 text-foreground/80;
+}
+
+.blog-content ul {
+  @apply my-6 pl-6 list-disc space-y-2;
+}
+
+.blog-content ol {
+  @apply my-6 pl-6 list-decimal space-y-2;
+}
+
+.blog-content li {
+  @apply text-foreground/80 leading-relaxed;
+}
+
+.blog-content blockquote {
+  @apply border-l-4 border-primary bg-muted/30 pl-6 py-4 pr-4 italic text-foreground/70 rounded-r-lg my-8;
+}
+
+.blog-content a {
+  @apply text-primary underline underline-offset-2 hover:text-primary/80;
+}
+
+.blog-content strong {
+  @apply font-semibold text-foreground;
+}
+
+.blog-content img {
+  @apply rounded-xl shadow-lg my-8;
+}
+
+.blog-content code {
+  @apply bg-muted px-1.5 py-0.5 rounded text-sm;
+}
+
+.blog-content pre {
+  @apply bg-muted rounded-lg p-4 overflow-x-auto;
+}
