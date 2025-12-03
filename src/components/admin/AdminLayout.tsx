@@ -40,7 +40,7 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
   return (
     <div className="min-h-screen bg-background flex">
       {/* Sidebar */}
-      <aside className="w-64 bg-card border-r border-border">
+      <aside className="w-64 bg-card border-r border-border flex flex-col">
         <div className="p-6">
           <h1 className="text-2xl font-bold text-foreground">Admin Panel</h1>
           <p className="text-sm text-muted-foreground">My Card Machine</p>
@@ -68,7 +68,7 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
           })}
         </nav>
 
-        <div className="absolute bottom-6 left-3 right-3">
+        <div className="mt-auto p-3 border-t border-border">
           <button
             onClick={handleSignOut}
             className="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-muted-foreground hover:bg-accent hover:text-accent-foreground w-full"
