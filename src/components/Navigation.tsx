@@ -28,12 +28,16 @@ export const Navigation = () => {
     path: "/#how-it-works",
     hash: "#how-it-works"
   }, {
-    name: "Testimonials",
+    name: "Our Clients",
     path: "/#testimonials",
     hash: "#testimonials"
   }, {
     name: "Blog",
     path: "/blog",
+    hash: ""
+  }, {
+    name: "Classic View",
+    path: "/v1",
     hash: ""
   }];
 

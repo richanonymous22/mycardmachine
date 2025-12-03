@@ -42,18 +42,41 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
       StarterKit.configure({
         heading: {
           levels: [1, 2, 3],
+          HTMLAttributes: {
+            class: 'blog-heading',
+          },
+        },
+        bulletList: {
+          HTMLAttributes: {
+            class: 'list-disc pl-6 my-4 space-y-2',
+          },
+        },
+        orderedList: {
+          HTMLAttributes: {
+            class: 'list-decimal pl-6 my-4 space-y-2',
+          },
+        },
+        blockquote: {
+          HTMLAttributes: {
+            class: 'border-l-4 border-primary pl-4 italic my-4 text-muted-foreground',
+          },
+        },
+        paragraph: {
+          HTMLAttributes: {
+            class: 'my-4 leading-relaxed',
+          },
         },
       }),
       Underline,
       Image.configure({
         HTMLAttributes: {
-          class: "max-w-full h-auto rounded-lg my-4",
+          class: "max-w-full h-auto rounded-lg my-6",
         },
       }),
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
-          class: "text-primary underline",
+          class: "text-primary underline hover:text-primary/80",
         },
       }),
     ],
@@ -64,7 +87,7 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
     editorProps: {
       attributes: {
         class:
-          "prose prose-base md:prose-lg dark:prose-invert max-w-none min-h-[500px] p-4 focus:outline-none",
+          "prose prose-lg dark:prose-invert max-w-none min-h-[500px] p-6 focus:outline-none [&_h1]:text-4xl [&_h1]:font-bold [&_h1]:mb-6 [&_h1]:mt-8 [&_h2]:text-3xl [&_h2]:font-semibold [&_h2]:mb-4 [&_h2]:mt-6 [&_h3]:text-2xl [&_h3]:font-medium [&_h3]:mb-3 [&_h3]:mt-5",
       },
     },
   });

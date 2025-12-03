@@ -22,8 +22,6 @@ import ApplicationsManagement from "./pages/admin/ApplicationsManagement";
 import CallbacksManagement from "./pages/admin/CallbacksManagement";
 import BlogManagement from "./pages/admin/BlogManagement";
 import BlogEditor from "./pages/admin/BlogEditor";
-import BlogManagement from "./pages/admin/BlogManagement";
-import BlogEditor from "./pages/admin/BlogEditor";
  
 const queryClient = new QueryClient();
  
