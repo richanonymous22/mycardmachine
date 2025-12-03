@@ -20,24 +20,44 @@ import {
   Linkedin as LinkedinIcon,
   Link as LinkIcon,
   Loader2,
+  Heart,
+  MessageCircle,
+  Reply,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { format } from "date-fns";
 import { Helmet } from "react-helmet";
 import { useToast } from "@/hooks/use-toast";
- 
+
 const calculateReadingTime = (html: string) => {
   const text = html.replace(/<[^>]+>/g, " ");
   const words = text.trim().split(/\s+/).filter(Boolean).length;
   return Math.max(1, Math.round(words / 200));
 };
- 
+
+// Generate a simple fingerprint for anonymous likes
+const getFingerprint = () => {
+  let fp = localStorage.getItem("blog_fingerprint");
+  if (!fp) {
+    fp = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    localStorage.setItem("blog_fingerprint", fp);
+  }
+  return fp;
+};
+
 const BlogPost = () => {
   const { slug } = useParams();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [commentAuthor, setCommentAuthor] = useState("");
   const [commentContent, setCommentContent] = useState("");
- 
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [replyAuthor, setReplyAuthor] = useState("");
+  const [replyContent, setReplyContent] = useState("");
+  const [expandedReplies, setExpandedReplies] = useState<Set<string>>(new Set());
+  const fingerprint = getFingerprint();
+
   const { data: post, isLoading } = useQuery({
     queryKey: ["blog-post", slug],
     queryFn: async () => {
@@ -47,21 +67,21 @@ const BlogPost = () => {
         .eq("slug", slug)
         .eq("status", "published")
         .single();
- 
+
       if (error) throw error;
       return data;
     },
   });
- 
+
   const { data: relatedPosts } = useQuery({
     queryKey: ["related-blog-posts", slug, post?.tags],
     queryFn: async () => {
       if (!post?.tags || post.tags.length === 0) {
         return [] as any[];
       }
- 
+
       const primaryTag = post.tags[0];
- 
+
       const { data, error } = await supabase
         .from("blog_posts")
         .select("*")
@@ -70,47 +90,143 @@ const BlogPost = () => {
         .neq("slug", slug)
         .order("published_at", { ascending: false })
         .limit(3);
- 
+
       if (error) throw error;
       return data;
     },
     enabled: !!post && !!post.tags && post.tags.length > 0,
   });
- 
+
   const { data: comments } = useQuery({
     queryKey: ["blog-comments", post?.id],
     queryFn: async () => {
       if (!post?.id) return [] as any[];
- 
+
       const { data, error } = await supabase
         .from("blog_comments")
         .select("*")
         .eq("post_id", post.id)
         .order("created_at", { ascending: true });
- 
+
       if (error) throw error;
       return data;
     },
     enabled: !!post?.id,
   });
- 
+
+  const { data: postLikes } = useQuery({
+    queryKey: ["blog-likes", post?.id],
+    queryFn: async () => {
+      if (!post?.id) return { count: 0, hasLiked: false };
+
+      const { data, error } = await supabase
+        .from("blog_likes")
+        .select("*")
+        .eq("post_id", post.id);
+
+      if (error) throw error;
+      return {
+        count: data?.length || 0,
+        hasLiked: data?.some((l: any) => l.user_fingerprint === fingerprint) || false,
+      };
+    },
+    enabled: !!post?.id,
+  });
+
+  const { data: commentLikesData } = useQuery({
+    queryKey: ["comment-likes", post?.id],
+    queryFn: async () => {
+      if (!post?.id || !comments) return {};
+
+      const commentIds = comments.map((c: any) => c.id);
+      if (commentIds.length === 0) return {};
+
+      const { data, error } = await supabase
+        .from("comment_likes")
+        .select("*")
+        .in("comment_id", commentIds);
+
+      if (error) throw error;
+
+      const likesMap: Record<string, { count: number; hasLiked: boolean }> = {};
+      commentIds.forEach((id: string) => {
+        const likes = data?.filter((l: any) => l.comment_id === id) || [];
+        likesMap[id] = {
+          count: likes.length,
+          hasLiked: likes.some((l: any) => l.user_fingerprint === fingerprint),
+        };
+      });
+      return likesMap;
+    },
+    enabled: !!post?.id && !!comments && comments.length > 0,
+  });
+
+  const likePostMutation = useMutation({
+    mutationFn: async () => {
+      if (!post?.id) throw new Error("Post not loaded");
+
+      if (postLikes?.hasLiked) {
+        const { error } = await supabase
+          .from("blog_likes")
+          .delete()
+          .eq("post_id", post.id)
+          .eq("user_fingerprint", fingerprint);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from("blog_likes").insert({
+          post_id: post.id,
+          user_fingerprint: fingerprint,
+        });
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["blog-likes", post?.id] });
+    },
+  });
+
+  const likeCommentMutation = useMutation({
+    mutationFn: async (commentId: string) => {
+      const hasLiked = commentLikesData?.[commentId]?.hasLiked;
+
+      if (hasLiked) {
+        const { error } = await supabase
+          .from("comment_likes")
+          .delete()
+          .eq("comment_id", commentId)
+          .eq("user_fingerprint", fingerprint);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from("comment_likes").insert({
+          comment_id: commentId,
+          user_fingerprint: fingerprint,
+        });
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["comment-likes", post?.id] });
+    },
+  });
+
   const commentMutation = useMutation({
     mutationFn: async () => {
       if (!post?.id) {
         throw new Error("Post not loaded");
       }
- 
+
       const trimmedContent = commentContent.trim();
       if (!trimmedContent) {
         throw new Error("Comment cannot be empty");
       }
- 
+
       const { error } = await supabase.from("blog_comments").insert({
         post_id: post.id,
         author_name: commentAuthor || "Anonymous",
         content: trimmedContent,
+        parent_id: null,
       });
- 
+
       if (error) throw error;
     },
     onSuccess: () => {
@@ -129,22 +245,75 @@ const BlogPost = () => {
       });
     },
   });
- 
+
+  const replyMutation = useMutation({
+    mutationFn: async (parentId: string) => {
+      if (!post?.id) throw new Error("Post not loaded");
+
+      const trimmedContent = replyContent.trim();
+      if (!trimmedContent) throw new Error("Reply cannot be empty");
+
+      const { error } = await supabase.from("blog_comments").insert({
+        post_id: post.id,
+        author_name: replyAuthor || "Anonymous",
+        content: trimmedContent,
+        parent_id: parentId,
+      });
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      setReplyContent("");
+      setReplyAuthor("");
+      setReplyingTo(null);
+      queryClient.invalidateQueries({ queryKey: ["blog-comments", post?.id] });
+      toast({
+        title: "Reply added",
+        description: "Your reply has been posted.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Reply failed",
+        description: error?.message || "Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleSubmitComment = (event: FormEvent) => {
     event.preventDefault();
     if (!commentContent.trim() || commentMutation.isPending) return;
     commentMutation.mutate();
   };
- 
+
+  const handleSubmitReply = (event: FormEvent, parentId: string) => {
+    event.preventDefault();
+    if (!replyContent.trim() || replyMutation.isPending) return;
+    replyMutation.mutate(parentId);
+  };
+
+  const toggleReplies = (commentId: string) => {
+    setExpandedReplies((prev) => {
+      const next = new Set(prev);
+      if (next.has(commentId)) {
+        next.delete(commentId);
+      } else {
+        next.add(commentId);
+      }
+      return next;
+    });
+  };
+
   const readingTime = post ? calculateReadingTime(post.content) : null;
   const currentUrl = typeof window !== "undefined" ? window.location.href : "";
- 
+
   const shareTo = (platform: "twitter" | "linkedin" | "facebook") => {
     if (!post) return;
- 
+
     const url = encodeURIComponent(currentUrl || window.location.href);
     const text = encodeURIComponent(post.title);
- 
+
     let shareUrl = "";
     if (platform === "twitter") {
       shareUrl = `https://twitter.com/intent/tweet?url=${url}&text=${text}`;
@@ -153,10 +322,10 @@ const BlogPost = () => {
     } else if (platform === "facebook") {
       shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
     }
- 
+
     window.open(shareUrl, "_blank", "noopener,noreferrer");
   };
- 
+
   const handleNativeShare = async () => {
     if (!post) return;
     if (typeof navigator !== "undefined" && (navigator as any).share) {
@@ -171,10 +340,10 @@ const BlogPost = () => {
       }
     }
   };
- 
+
   const handleCopyLink = async () => {
     if (!currentUrl) return;
- 
+
     try {
       if (navigator.clipboard && navigator.clipboard.writeText) {
         await navigator.clipboard.writeText(currentUrl);
@@ -191,7 +360,12 @@ const BlogPost = () => {
       });
     }
   };
- 
+
+  // Separate top-level comments and replies
+  const topLevelComments = comments?.filter((c: any) => !c.parent_id) || [];
+  const getReplies = (parentId: string) =>
+    comments?.filter((c: any) => c.parent_id === parentId) || [];
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
@@ -214,7 +388,7 @@ const BlogPost = () => {
       </div>
     );
   }
- 
+
   if (!post) {
     return (
       <div className="min-h-screen bg-background">
@@ -236,16 +410,16 @@ const BlogPost = () => {
       </div>
     );
   }
- 
+
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
         <title>{post.meta_title || post.title} | My Card Machine</title>
         <meta name="description" content={post.meta_description || post.excerpt} />
       </Helmet>
- 
+
       <Navigation />
- 
+
       <main className="pt-24 pb-16">
         <article className="container mx-auto px-4 max-w-4xl">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
@@ -255,12 +429,12 @@ const BlogPost = () => {
                 Back to Blog
               </Link>
             </Button>
- 
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">{post.title}</h1>
- 
-            <p className="text-lg text-muted-foreground mb-6">{post.excerpt}</p>
- 
-            <div className="flex flex-wrap items-center gap-4 mb-4 text-sm text-muted-foreground">
+
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 leading-tight">{post.title}</h1>
+
+            <p className="text-base sm:text-lg text-muted-foreground mb-6">{post.excerpt}</p>
+
+            <div className="flex flex-wrap items-center gap-3 sm:gap-4 mb-6 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4" />
                 <span>
@@ -269,42 +443,45 @@ const BlogPost = () => {
                     : "Draft"}
                 </span>
               </div>
- 
-              <span className="text-muted-foreground">•</span>
- 
+
+              <span className="hidden sm:inline text-muted-foreground">•</span>
+
               <span>By {post.author_name}</span>
- 
+
               {readingTime && (
                 <>
-                  <span className="text-muted-foreground">•</span>
+                  <span className="hidden sm:inline text-muted-foreground">•</span>
                   <span>{readingTime} min read</span>
                 </>
               )}
- 
-              {post.tags && post.tags.length > 0 && (
-                <>
-                  <span className="text-muted-foreground">•</span>
-                  <div className="flex flex-wrap gap-2">
-                    {post.tags.map((tag) => (
-                      <Badge key={tag} variant="secondary">
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
-                </>
-              )}
             </div>
- 
-            <div className="flex flex-wrap items-center justify-between gap-3 mb-8">
-              <span className="text-sm text-muted-foreground">
-                Share this article
-              </span>
+
+            {/* Like and Share Row */}
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-8 pb-6 border-b border-border">
+              <div className="flex items-center gap-4">
+                <Button
+                  type="button"
+                  variant={postLikes?.hasLiked ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => likePostMutation.mutate()}
+                  disabled={likePostMutation.isPending}
+                  className="gap-2"
+                >
+                  <Heart className={`w-4 h-4 ${postLikes?.hasLiked ? "fill-current" : ""}`} />
+                  <span>{postLikes?.count || 0}</span>
+                </Button>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <MessageCircle className="w-4 h-4" />
+                  <span>{comments?.length || 0} comments</span>
+                </div>
+              </div>
               <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground hidden sm:inline">Share</span>
                 <Button
                   type="button"
                   variant="outline"
                   size="icon"
-                  className="hidden sm:inline-flex"
+                  className="h-8 w-8 sm:hidden"
                   onClick={handleNativeShare}
                 >
                   <Share2 className="w-4 h-4" />
@@ -313,6 +490,7 @@ const BlogPost = () => {
                   type="button"
                   variant="outline"
                   size="icon"
+                  className="h-8 w-8"
                   aria-label="Share on Twitter"
                   onClick={() => shareTo("twitter")}
                 >
@@ -322,6 +500,7 @@ const BlogPost = () => {
                   type="button"
                   variant="outline"
                   size="icon"
+                  className="h-8 w-8"
                   aria-label="Share on LinkedIn"
                   onClick={() => shareTo("linkedin")}
                 >
@@ -331,6 +510,7 @@ const BlogPost = () => {
                   type="button"
                   variant="outline"
                   size="icon"
+                  className="h-8 w-8"
                   aria-label="Share on Facebook"
                   onClick={() => shareTo("facebook")}
                 >
@@ -340,6 +520,7 @@ const BlogPost = () => {
                   type="button"
                   variant="outline"
                   size="icon"
+                  className="h-8 w-8"
                   aria-label="Copy article link"
                   onClick={handleCopyLink}
                 >
@@ -347,7 +528,7 @@ const BlogPost = () => {
                 </Button>
               </div>
             </div>
- 
+
             {post.featured_image_url && (
               <div className="aspect-video overflow-hidden rounded-lg mb-8 shadow-lg">
                 <img
@@ -357,32 +538,53 @@ const BlogPost = () => {
                 />
               </div>
             )}
- 
+
             <div
-              className="blog-content prose prose-lg prose-invert max-w-none"
+              className="blog-content prose prose-lg max-w-none"
               dangerouslySetInnerHTML={{ __html: post.content }}
             />
- 
+
+            {/* Tags at the end of article */}
+            {post.tags && post.tags.length > 0 && (
+              <div className="mt-10 pt-6 border-t border-border">
+                <span className="text-sm text-muted-foreground mr-3">Tags:</span>
+                <div className="inline-flex flex-wrap gap-2">
+                  {post.tags.map((tag) => (
+                    <Badge key={tag} variant="secondary" className="text-xs">
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Comments Section */}
             <section className="mt-12 border-t border-border pt-8">
-              <h2 className="text-2xl font-semibold mb-4">Comments</h2>
-              <form onSubmit={handleSubmitComment} className="space-y-4 mb-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2">
+                <MessageCircle className="w-6 h-6" />
+                Comments ({comments?.length || 0})
+              </h2>
+              
+              <form onSubmit={handleSubmitComment} className="space-y-4 mb-8 bg-card/50 p-4 sm:p-6 rounded-xl border border-border">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium mb-1">Name (optional)</label>
+                    <label className="block text-sm font-medium mb-2">Name (optional)</label>
                     <Input
                       value={commentAuthor}
                       onChange={(e) => setCommentAuthor(e.target.value)}
-                      placeholder="How should we display your name?"
+                      placeholder="Your name"
+                      className="bg-background"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Comment</label>
+                  <label className="block text-sm font-medium mb-2">Your comment</label>
                   <Textarea
                     value={commentContent}
                     onChange={(e) => setCommentContent(e.target.value)}
                     placeholder="Share your thoughts about this article..."
                     rows={4}
+                    className="bg-background"
                   />
                 </div>
                 <Button
@@ -395,61 +597,171 @@ const BlogPost = () => {
                   Post comment
                 </Button>
               </form>
- 
-              {comments && comments.length > 0 ? (
+
+              {topLevelComments.length > 0 ? (
                 <div className="space-y-6">
-                  {comments.map((comment: any) => (
-                    <div
-                      key={comment.id}
-                      className="flex gap-4"
-                    >
-                      <div className="flex-shrink-0">
-                        <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-semibold text-sm">
-                          {(comment.author_name || "A").charAt(0).toUpperCase()}
+                  {topLevelComments.map((comment: any) => {
+                    const replies = getReplies(comment.id);
+                    const likeData = commentLikesData?.[comment.id];
+                    const isExpanded = expandedReplies.has(comment.id);
+
+                    return (
+                      <div key={comment.id} className="bg-card/30 rounded-xl p-4 sm:p-5 border border-border/50">
+                        <div className="flex gap-3 sm:gap-4">
+                          <div className="flex-shrink-0">
+                            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-primary/30 to-primary/10 flex items-center justify-center text-primary font-bold text-sm sm:text-base border border-primary/20">
+                              {(comment.author_name || "A").charAt(0).toUpperCase()}
+                            </div>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex flex-wrap items-center gap-2 mb-2">
+                              <span className="font-semibold text-foreground">
+                                {comment.author_name || "Anonymous"}
+                              </span>
+                              <span className="text-xs text-muted-foreground">
+                                {format(new Date(comment.created_at), "MMM d, yyyy")}
+                              </span>
+                            </div>
+                            <p className="text-foreground/90 leading-relaxed mb-3 text-sm sm:text-base">
+                              {comment.content}
+                            </p>
+                            <div className="flex items-center gap-3">
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 px-2 text-xs gap-1.5"
+                                onClick={() => likeCommentMutation.mutate(comment.id)}
+                              >
+                                <Heart className={`w-3.5 h-3.5 ${likeData?.hasLiked ? "fill-primary text-primary" : ""}`} />
+                                {likeData?.count || 0}
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 px-2 text-xs gap-1.5"
+                                onClick={() => setReplyingTo(replyingTo === comment.id ? null : comment.id)}
+                              >
+                                <Reply className="w-3.5 h-3.5" />
+                                Reply
+                              </Button>
+                              {replies.length > 0 && (
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-8 px-2 text-xs gap-1.5"
+                                  onClick={() => toggleReplies(comment.id)}
+                                >
+                                  {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                                  {replies.length} {replies.length === 1 ? "reply" : "replies"}
+                                </Button>
+                              )}
+                            </div>
+
+                            {/* Reply form */}
+                            {replyingTo === comment.id && (
+                              <form
+                                onSubmit={(e) => handleSubmitReply(e, comment.id)}
+                                className="mt-4 p-3 sm:p-4 bg-background/50 rounded-lg border border-border/50 space-y-3"
+                              >
+                                <Input
+                                  value={replyAuthor}
+                                  onChange={(e) => setReplyAuthor(e.target.value)}
+                                  placeholder="Your name (optional)"
+                                  className="bg-background text-sm"
+                                />
+                                <Textarea
+                                  value={replyContent}
+                                  onChange={(e) => setReplyContent(e.target.value)}
+                                  placeholder="Write your reply..."
+                                  rows={2}
+                                  className="bg-background text-sm"
+                                />
+                                <div className="flex gap-2">
+                                  <Button type="submit" size="sm" disabled={replyMutation.isPending || !replyContent.trim()}>
+                                    {replyMutation.isPending && <Loader2 className="w-3 h-3 mr-1 animate-spin" />}
+                                    Reply
+                                  </Button>
+                                  <Button type="button" variant="ghost" size="sm" onClick={() => setReplyingTo(null)}>
+                                    Cancel
+                                  </Button>
+                                </div>
+                              </form>
+                            )}
+
+                            {/* Replies */}
+                            {isExpanded && replies.length > 0 && (
+                              <div className="mt-4 space-y-3 pl-2 sm:pl-4 border-l-2 border-primary/20">
+                                {replies.map((reply: any) => {
+                                  const replyLikeData = commentLikesData?.[reply.id];
+                                  return (
+                                    <div key={reply.id} className="bg-background/30 rounded-lg p-3 sm:p-4">
+                                      <div className="flex gap-3">
+                                        <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-semibold text-xs">
+                                          {(reply.author_name || "A").charAt(0).toUpperCase()}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                          <div className="flex flex-wrap items-center gap-2 mb-1">
+                                            <span className="font-medium text-sm">
+                                              {reply.author_name || "Anonymous"}
+                                            </span>
+                                            <span className="text-xs text-muted-foreground">
+                                              {format(new Date(reply.created_at), "MMM d")}
+                                            </span>
+                                          </div>
+                                          <p className="text-sm text-foreground/85">{reply.content}</p>
+                                          <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="sm"
+                                            className="h-6 px-1.5 text-xs gap-1 mt-2"
+                                            onClick={() => likeCommentMutation.mutate(reply.id)}
+                                          >
+                                            <Heart className={`w-3 h-3 ${replyLikeData?.hasLiked ? "fill-primary text-primary" : ""}`} />
+                                            {replyLikeData?.count || 0}
+                                          </Button>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="font-medium text-foreground">
-                            {comment.author_name || "Anonymous"}
-                          </span>
-                          <span className="text-xs text-muted-foreground">
-                            {format(new Date(comment.created_at), "MMM d, yyyy 'at' HH:mm")}
-                          </span>
-                        </div>
-                        <p className="text-muted-foreground leading-relaxed">
-                          {comment.content}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               ) : (
-                <p className="text-sm text-muted-foreground">
-                  No comments yet. Be the first to share your thoughts.
-                </p>
+                <div className="text-center py-8 text-muted-foreground bg-card/30 rounded-xl border border-border/50">
+                  <MessageCircle className="w-10 h-10 mx-auto mb-3 opacity-50" />
+                  <p>No comments yet. Be the first to share your thoughts!</p>
+                </div>
               )}
             </section>
- 
+
             {relatedPosts && relatedPosts.length > 0 && (
               <section className="mt-12 border-t border-border pt-8">
-                <h2 className="text-2xl font-semibold mb-4">Related articles</h2>
-                <div className="grid gap-4 md:grid-cols-3">
+                <h2 className="text-2xl font-semibold mb-6">Related articles</h2>
+                <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
                   {relatedPosts.map((related: any) => (
                     <Link key={related.id} to={`/blog/${related.slug}`}>
-                      <Card className="h-full hover:shadow-lg transition-shadow">
+                      <Card className="h-full hover:shadow-lg transition-all hover:border-primary/30 group">
                         <CardContent className="p-4">
                           <p className="text-sm text-muted-foreground mb-1">
                             {related.published_at
                               ? format(new Date(related.published_at), "MMM d, yyyy")
                               : ""}
                           </p>
-                          <h3 className="font-semibold mb-2 line-clamp-2">
+                          <h3 className="font-semibold mb-2 line-clamp-2 group-hover:text-primary transition-colors">
                             {related.title}
                           </h3>
                           <div className="flex items-center text-sm text-primary font-medium">
                             Read article
-                            <ArrowRight className="w-4 h-4 ml-1" />
+                            <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
                           </div>
                         </CardContent>
                       </Card>
@@ -461,10 +773,10 @@ const BlogPost = () => {
           </motion.div>
         </article>
       </main>
- 
+
       <Footer />
     </div>
   );
 };
- 
+
 export default BlogPost;

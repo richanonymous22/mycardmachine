@@ -20,7 +20,7 @@ import {
   ImageIcon,
   Link as LinkIcon,
 } from 'lucide-react';
-import { useState, type ChangeEvent } from "react";
+import { useState, useEffect, type ChangeEvent } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -91,6 +91,13 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
       },
     },
   });
+
+  // Update editor content when prop changes (for editing existing posts)
+  useEffect(() => {
+    if (editor && content !== editor.getHTML()) {
+      editor.commands.setContent(content);
+    }
+  }, [content, editor]);
 
   if (!editor) {
     return null;
