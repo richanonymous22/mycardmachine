@@ -18,13 +18,25 @@ serve(async (req) => {
     const { type, data, documents } = await req.json();
     
     if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
+      console.error('Telegram credentials missing:', { hasToken: !!TELEGRAM_BOT_TOKEN, hasChatId: !!TELEGRAM_CHAT_ID });
       throw new Error('Telegram credentials not configured');
     }
 
-    const timestamp = new Date(data.created_at).toLocaleString('en-GB', {
-      dateStyle: 'short',
-      timeStyle: 'short',
-    });
+    // Handle null data gracefully
+    if (!data) {
+      console.error('No data provided to telegram-notify');
+      throw new Error('No data provided');
+    }
+
+    const timestamp = data.created_at 
+      ? new Date(data.created_at).toLocaleString('en-GB', {
+          dateStyle: 'short',
+          timeStyle: 'short',
+        })
+      : new Date().toLocaleString('en-GB', {
+          dateStyle: 'short',
+          timeStyle: 'short',
+        });
 
     let message = '';
     let recordId = '';
