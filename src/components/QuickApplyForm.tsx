@@ -105,12 +105,21 @@ export const QuickApplyForm = ({ partner, costs, monthlyTurnover, onBack, onSucc
         .select("*")
         .eq("application_id", applicationId);
 
-      // Get full application data
-      const { data: applicationData } = await supabase
-        .from("applications")
-        .select("*")
-        .eq("id", applicationId)
-        .single();
+      // Use the form values we already have instead of fetching from DB (RLS blocks it)
+      const formValues = form.getValues();
+      const applicationData = {
+        id: applicationId,
+        name: formValues.name,
+        email: formValues.email,
+        phone: formValues.phone,
+        partner_id: partner.id,
+        partner_name: partner.name,
+        monthly_turnover: monthlyTurnover,
+        estimated_monthly_cost: costs.totalMonthlyCost,
+        estimated_annual_savings: costs.annualCost,
+        status: 'pending',
+        created_at: new Date().toISOString()
+      };
 
       // Send Telegram notification with complete data and documents
       try {

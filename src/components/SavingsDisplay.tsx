@@ -33,43 +33,62 @@ export const SavingsDisplay = ({
       
       setLoadingSummary(true);
       try {
-        // Generate concise, professional summary like in /v2
         const benefits = newPartner.benefits || newPartner.features || [];
-        const topBenefits = benefits.slice(0, 3);
+        const savingsText = `Save £${annualSavings.toFixed(0)} annually`;
         
-        let summary = `${newPartner.name} offers `;
+        // Build a detailed but concise summary
+        let summaryParts: string[] = [];
         
-        if (topBenefits.length > 0) {
-          summary += topBenefits.slice(0, 2).join(", ");
-          if (topBenefits.length > 2) {
-            summary += `, and ${topBenefits[2]}`;
-          }
-          summary += ". ";
+        // 1. Highlight key savings
+        summaryParts.push(`By switching to ${newPartner.name}, you'll ${savingsText.toLowerCase()} compared to ${currentPartner.name}`);
+        
+        // 2. Contract advantages
+        const currentHasContract = currentPartner.contract_length?.includes("month") && !currentPartner.contract_length?.includes("No");
+        const newNoContract = newPartner.contract_length?.toLowerCase().includes("no contract");
+        if (currentHasContract && newNoContract) {
+          summaryParts.push("Enjoy complete flexibility with no long-term contract commitments");
+        } else if (newNoContract) {
+          summaryParts.push("No lock-in contracts mean you're free to switch anytime");
         }
         
-        // Add contract benefit if applicable
-        if (newPartner.contract_length === "No contract – cancel anytime") {
-          summary += "With no long-term commitment, you have the flexibility to switch if your needs change. ";
+        // 3. Settlement time advantage
+        if (newPartner.settlement_time?.includes("Next working day") || newPartner.settlement_time?.includes("Same day")) {
+          summaryParts.push(`Faster access to your money with ${newPartner.settlement_time.toLowerCase().replace("next working day", "next-day").replace("(", "").replace(")", "")}`);
         }
         
-        // Add settlement benefit if applicable
-        if (newPartner.settlement_time?.includes("Same day") || newPartner.settlement_time?.includes("Next working day")) {
-          summary += `Funds are settled ${newPartner.settlement_time.toLowerCase()}, ensuring healthy cash flow.`;
-        } else {
-          summary += "Reliable payment processing to keep your business running smoothly.";
+        // 4. Fee advantages - look for zero fees
+        const noHiddenFees = [];
+        if (newPartner.fees?.pci_fee === 0) noHiddenFees.push("PCI");
+        if (newPartner.fees?.setup_fee === 0) noHiddenFees.push("setup");
+        if (newPartner.fees?.monthly_rental === 0) noHiddenFees.push("monthly rental");
+        if (noHiddenFees.length >= 2) {
+          summaryParts.push(`No ${noHiddenFees.slice(0, 2).join(" or ")} fees keeping costs transparent`);
         }
         
+        // 5. Top feature if not already covered
+        const keyFeature = benefits.find(b => 
+          b.toLowerCase().includes("instant") || 
+          b.toLowerCase().includes("free") ||
+          b.toLowerCase().includes("cashback") ||
+          b.toLowerCase().includes("app")
+        );
+        if (keyFeature && summaryParts.length < 4) {
+          summaryParts.push(keyFeature);
+        }
+        
+        // Combine into flowing summary
+        const summary = summaryParts.slice(0, 3).join(". ") + ".";
         setAiSummary(summary);
       } catch (error) {
         console.error("Error generating summary:", error);
-        setAiSummary(`${newPartner.name} provides competitive rates and professional payment processing solutions tailored to your business needs.`);
+        setAiSummary(`${newPartner.name} offers competitive rates with transparent pricing, helping you reduce payment processing costs significantly.`);
       } finally {
         setLoadingSummary(false);
       }
     };
 
     generateSummary();
-  }, [currentPartner, newPartner]);
+  }, [currentPartner, newPartner, annualSavings]);
 
   if (!currentPartner || !newPartner || !turnover) {
     return null;

@@ -100,7 +100,7 @@ const Apply = () => {
   };
 
   const handleDocumentsComplete = async () => {
-    if (!applicationId) return;
+    if (!applicationId || !partner) return;
     
     setIsSubmitting(true);
     try {
@@ -117,12 +117,21 @@ const Apply = () => {
         .select("*")
         .eq("application_id", applicationId);
 
-      // Get full application data
-      const { data: applicationData } = await supabase
-        .from("applications")
-        .select("*")
-        .eq("id", applicationId)
-        .single();
+      // Use form values directly instead of fetching from DB (RLS blocks it)
+      const formValues = form.getValues();
+      const applicationData = {
+        id: applicationId,
+        name: formValues.name,
+        email: formValues.email,
+        phone: formValues.phone,
+        partner_id: partner.id,
+        partner_name: partner.name,
+        monthly_turnover: monthlyTurnover,
+        estimated_monthly_cost: estimatedCost,
+        estimated_annual_savings: estimatedSavings,
+        status: 'pending',
+        created_at: new Date().toISOString()
+      };
 
       // Send Telegram notification with complete data and documents
       try {
@@ -138,14 +147,14 @@ const Apply = () => {
       }
 
       // Send confirmation email to user
-      if (applicationData?.email) {
+      if (formValues.email) {
         try {
           await supabase.functions.invoke('send-confirmation-email', {
             body: {
-              to: applicationData.email,
-              name: applicationData.name,
+              to: formValues.email,
+              name: formValues.name,
               type: 'application',
-              partnerName: applicationData.partner_name
+              partnerName: partner.name
             }
           });
         } catch (emailError) {
