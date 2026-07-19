@@ -58,72 +58,92 @@ const convertProviderToPartner = (provider: ProviderRow): Partner => {
   };
 };
 
+import { partners as fallbackPartners } from "@/data/partners";
+
 export const useProviders = () => {
   return useQuery({
     queryKey: ["providers"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("providers")
-        .select("*")
-        .eq("is_active", true)
-        .order("display_order", { ascending: true });
+      try {
+        const { data, error } = await supabase
+          .from("providers")
+          .select("*")
+          .eq("is_active", true)
+          .order("display_order", { ascending: true });
 
-      if (error) throw error;
-      
-      return (data as ProviderRow[]).map(convertProviderToPartner);
+        if (error) throw error;
+        if (!data || data.length === 0) throw new Error("No providers");
+
+        return (data as ProviderRow[]).map(convertProviderToPartner);
+      } catch (err) {
+        console.warn("[useProviders] Falling back to dummy data:", err);
+        return fallbackPartners.filter((p) => p.id !== "custom") as unknown as Partner[];
+      }
     },
-    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    retry: false,
+    staleTime: 5 * 60 * 1000,
   });
 };
+
 
 export const useProviderOffers = (turnover?: number) => {
   return useQuery({
     queryKey: ["provider-offers", turnover],
     queryFn: async () => {
-      let query = supabase
-        .from("provider_offers")
-        .select("*")
-        .eq("is_active", true)
-        .lte("start_date", new Date().toISOString())
-        .gte("end_date", new Date().toISOString())
-        .order("priority", { ascending: false });
+      try {
+        const { data, error } = await supabase
+          .from("provider_offers")
+          .select("*")
+          .eq("is_active", true)
+          .lte("start_date", new Date().toISOString())
+          .gte("end_date", new Date().toISOString())
+          .order("priority", { ascending: false });
 
-      const { data, error } = await query;
+        if (error) throw error;
 
-      if (error) throw error;
+        if (turnover) {
+          return (data as ProviderOffer[]).filter(offer => {
+            const meetsMin = offer.min_turnover === null || turnover >= offer.min_turnover;
+            const meetsMax = offer.max_turnover === null || turnover <= offer.max_turnover;
+            return meetsMin && meetsMax;
+          });
+        }
 
-      // Filter by turnover on the client side if provided
-      if (turnover) {
-        return (data as ProviderOffer[]).filter(offer => {
-          const meetsMin = offer.min_turnover === null || turnover >= offer.min_turnover;
-          const meetsMax = offer.max_turnover === null || turnover <= offer.max_turnover;
-          return meetsMin && meetsMax;
-        });
+        return data as ProviderOffer[];
+      } catch (err) {
+        console.warn("[useProviderOffers] Backend unavailable, returning empty offers");
+        return [] as ProviderOffer[];
       }
-
-      return data as ProviderOffer[];
     },
     enabled: turnover !== undefined,
-    staleTime: 2 * 60 * 1000, // Cache for 2 minutes (offers might change)
+    retry: false,
+    staleTime: 2 * 60 * 1000,
   });
 };
+
 
 export const usePriorityRules = (turnover: number) => {
   return useQuery({
     queryKey: ["priority-rules", turnover],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("priority_rules")
-        .select("*")
-        .eq("is_active", true)
-        .lte("min_turnover", turnover)
-        .gte("max_turnover", turnover)
-        .order("priority_score", { ascending: false });
+      try {
+        const { data, error } = await supabase
+          .from("priority_rules")
+          .select("*")
+          .eq("is_active", true)
+          .lte("min_turnover", turnover)
+          .gte("max_turnover", turnover)
+          .order("priority_score", { ascending: false });
 
-      if (error) throw error;
-      
-      return data as PriorityRule[];
+        if (error) throw error;
+        return data as PriorityRule[];
+      } catch (err) {
+        console.warn("[usePriorityRules] Backend unavailable, returning empty rules");
+        return [] as PriorityRule[];
+      }
     },
+    retry: false,
     staleTime: 5 * 60 * 1000,
   });
 };
+

@@ -25,7 +25,7 @@ export const HeroV2 = () => {
           className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-card border border-border mb-8"
         >
           <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-          <span className="text-xs font-semibold uppercase tracking-widest text-indigo-200">
+          <span className="text-xs font-semibold uppercase tracking-widest text-primary/80">
             Live UK Market Rates
           </span>
         </motion.div>
@@ -48,7 +48,7 @@ export const HeroV2 = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.15 }}
-          className="max-w-2xl mx-auto text-lg md:text-xl text-indigo-100/60 font-medium leading-relaxed mb-12 px-4"
+          className="max-w-2xl mx-auto text-lg md:text-xl text-foreground/70 font-medium leading-relaxed mb-12 px-4"
         >
           The UK's most transparent card machine comparison. We surface the
           margins other brokers hide — zero fees, no fluff.
@@ -94,7 +94,7 @@ export const HeroV2 = () => {
               <div className="font-display text-2xl md:text-4xl font-extrabold text-white mb-1">
                 {s.value}
               </div>
-              <div className="text-[11px] md:text-xs uppercase tracking-widest text-indigo-300/60">
+              <div className="text-[11px] md:text-xs uppercase tracking-widest text-muted-foreground">
                 {s.label}
               </div>
             </div>
