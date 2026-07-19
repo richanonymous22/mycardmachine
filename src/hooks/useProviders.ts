@@ -126,18 +126,24 @@ export const usePriorityRules = (turnover: number) => {
   return useQuery({
     queryKey: ["priority-rules", turnover],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("priority_rules")
-        .select("*")
-        .eq("is_active", true)
-        .lte("min_turnover", turnover)
-        .gte("max_turnover", turnover)
-        .order("priority_score", { ascending: false });
+      try {
+        const { data, error } = await supabase
+          .from("priority_rules")
+          .select("*")
+          .eq("is_active", true)
+          .lte("min_turnover", turnover)
+          .gte("max_turnover", turnover)
+          .order("priority_score", { ascending: false });
 
-      if (error) throw error;
-      
-      return data as PriorityRule[];
+        if (error) throw error;
+        return data as PriorityRule[];
+      } catch (err) {
+        console.warn("[usePriorityRules] Backend unavailable, returning empty rules");
+        return [] as PriorityRule[];
+      }
     },
+    retry: false,
     staleTime: 5 * 60 * 1000,
   });
 };
+
