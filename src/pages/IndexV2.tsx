@@ -99,58 +99,62 @@ const IndexV2 = () => {
         </div>
       )}
 
-      <div id="calculator-section" className="container mx-auto px-4 py-8 md:py-16 relative z-10">
-        {/* Premium Turnover Input Section */}
-        <Card className="max-w-2xl mx-auto mb-12 shadow-2xl border-primary/30 bg-gradient-to-br from-card/95 via-card/90 to-primary/10 relative overflow-hidden backdrop-blur-xl">
-          {/* Animated gradient border effect */}
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/30 to-primary/0 opacity-50 animate-pulse" />
-          <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:20px_20px]" />
-          
-          <div className="relative p-6 md:p-10">
-            {/* Icon and Title */}
-            <div className="text-center mb-8 space-y-4">
-              <div className="inline-flex p-4 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 shadow-lg shadow-primary/20 animate-in fade-in duration-500 hover:scale-110 transition-transform">
-                <TrendingUp className="h-8 w-8 md:h-10 md:w-10 text-primary drop-shadow-lg" />
-              </div>
-              <div className="space-y-2 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                <h2 className="text-2xl md:text-4xl font-bold text-foreground tracking-tight">
-                  What's your monthly card turnover?
-                </h2>
-                <p className="text-sm md:text-base text-muted-foreground max-w-lg mx-auto leading-relaxed">
-                  Enter your monthly turnover and we'll instantly show you the best payment providers
-                </p>
-              </div>
-            </div>
-            
-            {/* Input Section */}
-            <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700" style={{ animationDelay: '150ms' }}>
-              <Label htmlFor="turnover-v2" className="text-base md:text-lg font-semibold text-center block text-foreground/90">
-                Monthly Card Turnover
-              </Label>
-              <div className="relative group">
-                {/* Glow effect on focus */}
-                <div className="absolute -inset-1 bg-gradient-to-r from-primary/50 to-accent/50 rounded-xl opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 blur transition-opacity duration-300" />
-                
-                <div className="relative">
-                  <span className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 text-primary text-xl md:text-3xl font-bold z-10">
-                    £
-                  </span>
-                  <Input 
-                    id="turnover-v2" 
-                    type="text" 
-                    value={turnover && turnover > 0 ? turnover.toLocaleString() : ''} 
-                    onChange={e => handleTurnoverChange(e.target.value)} 
-                    placeholder="15,000" 
-                    className="pl-10 md:pl-14 pr-4 text-xl md:text-3xl h-14 md:h-20 text-center font-bold border-2 border-primary/30 focus-visible:ring-4 focus-visible:ring-primary/30 focus-visible:border-primary/60 transition-all duration-300 bg-background/80 backdrop-blur-sm shadow-lg hover:shadow-xl hover:border-primary/50" 
-                  />
+      <section id="calculator-section" className="relative py-24 md:py-32 px-6 bg-[hsl(240_45%_7%)] border-y border-border/50">
+        <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_top,hsl(var(--primary)/0.08),transparent_60%)]" />
+        <div className="max-w-7xl mx-auto relative">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+            {/* Left: Editorial headline */}
+            <div className="space-y-8">
+              <h2 className="font-display text-4xl md:text-6xl lg:text-7xl font-bold leading-[1.05]">
+                The Math
+                <br />
+                <span className="text-primary">is Simple.</span>
+              </h2>
+              <p className="text-lg md:text-xl text-indigo-100/50 max-w-lg leading-relaxed">
+                Most UK businesses are losing up to 40% of their margin to
+                legacy bank rates. Enter your turnover to see the delta.
+              </p>
+              <div className="grid grid-cols-2 gap-4 max-w-md">
+                <div className="p-6 rounded-3xl bg-card border border-border/60">
+                  <div className="font-display text-3xl font-bold mb-1">£2.4k</div>
+                  <div className="text-xs text-indigo-300 uppercase tracking-widest">Avg. Yearly Saving</div>
+                </div>
+                <div className="p-6 rounded-3xl bg-card border border-border/60">
+                  <div className="font-display text-3xl font-bold mb-1">0.4%</div>
+                  <div className="text-xs text-indigo-300 uppercase tracking-widest">Lowest Market Rate</div>
                 </div>
               </div>
-              <p className="text-xs md:text-sm text-muted-foreground text-center leading-relaxed">
-                Enter between <span className="text-primary font-semibold">£5,000</span> and <span className="text-primary font-semibold">£200,000</span> to see your personalized recommendations
-              </p>
+            </div>
+
+            {/* Right: Calculator */}
+            <div className="relative p-[1px] bg-gradient-to-br from-primary/60 via-border to-primary/20 rounded-[40px]">
+              <div className="bg-card rounded-[38px] p-8 md:p-12 shadow-premium">
+                <div>
+                  <Label className="block text-xs font-bold uppercase tracking-widest text-indigo-300/70 mb-6">
+                    Monthly Card Turnover
+                  </Label>
+                  <div className="relative flex items-center">
+                    <span className="absolute left-0 font-display text-4xl md:text-5xl font-bold text-indigo-200/30">£</span>
+                    <Input
+                      id="turnover-v2"
+                      type="text"
+                      value={turnover && turnover > 0 ? turnover.toLocaleString() : ""}
+                      onChange={(e) => handleTurnoverChange(e.target.value)}
+                      placeholder="15,000"
+                      className="font-display h-auto w-full bg-transparent border-0 border-b-2 border-border rounded-none pb-3 pl-10 text-4xl md:text-5xl font-bold text-white focus-visible:ring-0 focus-visible:border-primary focus-visible:outline-none transition-colors"
+                    />
+                  </div>
+                  <p className="text-xs text-indigo-300/50 mt-4">
+                    Enter between £5,000 and £200,000 for personalised results.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
-        </Card>
+        </div>
+      </section>
+
+      <div className="container mx-auto px-4 py-8 md:py-16 relative z-10">
 
         {/* Recommendations Section - Only show when turnover is entered */}
         {turnover > 0 && topRecommendations.length > 0 && <div className="space-y-8 animate-in fade-in duration-500">
