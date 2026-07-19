@@ -58,23 +58,33 @@ const convertProviderToPartner = (provider: ProviderRow): Partner => {
   };
 };
 
+import { partners as fallbackPartners } from "@/data/partners";
+
 export const useProviders = () => {
   return useQuery({
     queryKey: ["providers"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("providers")
-        .select("*")
-        .eq("is_active", true)
-        .order("display_order", { ascending: true });
+      try {
+        const { data, error } = await supabase
+          .from("providers")
+          .select("*")
+          .eq("is_active", true)
+          .order("display_order", { ascending: true });
 
-      if (error) throw error;
-      
-      return (data as ProviderRow[]).map(convertProviderToPartner);
+        if (error) throw error;
+        if (!data || data.length === 0) throw new Error("No providers");
+
+        return (data as ProviderRow[]).map(convertProviderToPartner);
+      } catch (err) {
+        console.warn("[useProviders] Falling back to dummy data:", err);
+        return fallbackPartners.filter((p) => p.id !== "custom") as unknown as Partner[];
+      }
     },
-    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    retry: false,
+    staleTime: 5 * 60 * 1000,
   });
 };
+
 
 export const useProviderOffers = (turnover?: number) => {
   return useQuery({
