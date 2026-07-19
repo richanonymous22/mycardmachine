@@ -110,18 +110,18 @@ const IndexV2 = () => {
                 <br />
                 <span className="text-primary">is Simple.</span>
               </h2>
-              <p className="text-lg md:text-xl text-indigo-100/50 max-w-lg leading-relaxed">
+              <p className="text-lg md:text-xl text-foreground/60 max-w-lg leading-relaxed">
                 Most UK businesses are losing up to 40% of their margin to
                 legacy bank rates. Enter your turnover to see the delta.
               </p>
               <div className="grid grid-cols-2 gap-4 max-w-md">
                 <div className="p-6 rounded-3xl bg-card border border-border/60">
                   <div className="font-display text-3xl font-bold mb-1">£2.4k</div>
-                  <div className="text-xs text-indigo-300 uppercase tracking-widest">Avg. Yearly Saving</div>
+                  <div className="text-xs text-primary/80 uppercase tracking-widest">Avg. Yearly Saving</div>
                 </div>
                 <div className="p-6 rounded-3xl bg-card border border-border/60">
                   <div className="font-display text-3xl font-bold mb-1">0.4%</div>
-                  <div className="text-xs text-indigo-300 uppercase tracking-widest">Lowest Market Rate</div>
+                  <div className="text-xs text-primary/80 uppercase tracking-widest">Lowest Market Rate</div>
                 </div>
               </div>
             </div>
@@ -130,11 +130,11 @@ const IndexV2 = () => {
             <div className="relative p-[1px] bg-gradient-to-br from-primary/60 via-border to-primary/20 rounded-[40px]">
               <div className="bg-card rounded-[38px] p-8 md:p-12 shadow-premium">
                 <div>
-                  <Label className="block text-xs font-bold uppercase tracking-widest text-indigo-300/70 mb-6">
+                  <Label className="block text-xs font-bold uppercase tracking-widest text-muted-foreground mb-6">
                     Monthly Card Turnover
                   </Label>
                   <div className="relative flex items-center">
-                    <span className="absolute left-0 font-display text-4xl md:text-5xl font-bold text-indigo-200/30">£</span>
+                    <span className="absolute left-0 font-display text-4xl md:text-5xl font-bold text-primary/80/30">£</span>
                     <Input
                       id="turnover-v2"
                       type="text"
@@ -144,7 +144,7 @@ const IndexV2 = () => {
                       className="font-display h-auto w-full bg-transparent border-0 border-b-2 border-border rounded-none pb-3 pl-10 text-4xl md:text-5xl font-bold text-white focus-visible:ring-0 focus-visible:border-primary focus-visible:outline-none transition-colors"
                     />
                   </div>
-                  <p className="text-xs text-indigo-300/50 mt-4">
+                  <p className="text-xs text-muted-foreground mt-4">
                     Enter between £5,000 and £200,000 for personalised results.
                   </p>
                 </div>
