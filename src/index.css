@@ -6,56 +6,56 @@
 
 @layer base {
   :root {
-    /* Midnight Indigo — Dark cinematic base */
-    --background: 240 43% 6%;              /* #0a0a1a */
-    --foreground: 0 0% 100%;
+    /* Warm Charcoal + Emerald — sophisticated, not blue */
+    --background: 160 12% 6%;               /* near-black with faint green */
+    --foreground: 40 20% 96%;               /* warm off-white */
 
-    --card: 240 42% 14%;                    /* #141432 */
-    --card-foreground: 0 0% 100%;
-    --card-border: 240 50% 24%;             /* #1e1e5a */
+    --card: 160 10% 10%;
+    --card-foreground: 40 20% 96%;
+    --card-border: 160 14% 18%;
 
-    --primary: 244 76% 59%;                 /* #4f46e5 electric indigo */
-    --primary-foreground: 0 0% 100%;
-    --primary-muted: 244 76% 59% / 0.1;
-    --primary-hover: 244 76% 54%;
-    --primary-glow: 244 76% 59% / 0.4;
+    --primary: 158 72% 46%;                 /* emerald */
+    --primary-foreground: 160 30% 8%;
+    --primary-muted: 158 72% 46% / 0.12;
+    --primary-hover: 158 72% 40%;
+    --primary-glow: 158 72% 55% / 0.45;
 
-    --secondary: 240 42% 14%;
-    --secondary-foreground: 0 0% 100%;
-    --secondary-hover: 240 50% 20%;
+    --secondary: 160 10% 12%;
+    --secondary-foreground: 40 20% 96%;
+    --secondary-hover: 160 12% 16%;
 
-    --accent: 244 76% 59%;
-    --accent-foreground: 0 0% 100%;
-    --accent-muted: 244 76% 59% / 0.1;
-    --accent-hover: 244 76% 54%;
+    --accent: 42 88% 62%;                   /* warm amber for highlights */
+    --accent-foreground: 160 30% 8%;
+    --accent-muted: 42 88% 62% / 0.12;
+    --accent-hover: 42 88% 55%;
 
-    --muted: 240 42% 12%;
-    --muted-foreground: 240 20% 65%;
-    --border: 240 50% 24%;
-    --input: 240 42% 12%;
-    --ring: 244 76% 59%;
+    --muted: 160 10% 12%;
+    --muted-foreground: 160 10% 62%;
+    --border: 160 14% 18%;
+    --input: 160 10% 14%;
+    --ring: 158 72% 46%;
 
-    --success: 142 76% 45%;
-    --success-foreground: 0 0% 100%;
+    --success: 158 72% 46%;
+    --success-foreground: 160 30% 8%;
     --warning: 38 92% 55%;
-    --warning-foreground: 240 43% 6%;
+    --warning-foreground: 160 30% 8%;
     --destructive: 0 73% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --popover: 240 42% 10%;
-    --popover-foreground: 0 0% 100%;
+    --popover: 160 12% 8%;
+    --popover-foreground: 40 20% 96%;
 
-    --gradient-primary: linear-gradient(135deg, hsl(244 76% 59%), hsl(244 76% 70%));
-    --gradient-secondary: linear-gradient(135deg, hsl(240 42% 10%), hsl(240 50% 18%));
-    --gradient-accent: linear-gradient(180deg, hsl(0 0% 100%), hsl(244 76% 59%));
-    --gradient-background: radial-gradient(ellipse 80% 50% at 50% -20%, hsl(244 76% 59% / 0.18), transparent);
+    --gradient-primary: linear-gradient(135deg, hsl(158 72% 46%), hsl(170 72% 55%));
+    --gradient-secondary: linear-gradient(135deg, hsl(160 10% 10%), hsl(160 14% 16%));
+    --gradient-accent: linear-gradient(180deg, hsl(42 88% 62%), hsl(158 72% 46%));
+    --gradient-background: radial-gradient(ellipse 80% 50% at 50% -20%, hsl(158 72% 46% / 0.18), transparent);
 
-    --shadow-sm: 0 1px 2px 0 hsl(240 43% 3% / 0.5);
-    --shadow-md: 0 4px 6px -1px hsl(240 43% 3% / 0.5);
-    --shadow-lg: 0 10px 25px -3px hsl(240 43% 3% / 0.6);
-    --shadow-xl: 0 25px 50px -12px hsl(240 43% 3% / 0.7);
-    --shadow-glow: 0 0 40px -10px hsl(244 76% 59% / 0.5);
-    --shadow-premium: 0 25px 50px -12px hsl(240 43% 3% / 0.9);
+    --shadow-sm: 0 1px 2px 0 hsl(160 30% 2% / 0.5);
+    --shadow-md: 0 4px 6px -1px hsl(160 30% 2% / 0.5);
+    --shadow-lg: 0 10px 25px -3px hsl(160 30% 2% / 0.6);
+    --shadow-xl: 0 25px 50px -12px hsl(160 30% 2% / 0.7);
+    --shadow-glow: 0 0 40px -10px hsl(158 72% 46% / 0.5);
+    --shadow-premium: 0 25px 50px -12px hsl(160 30% 2% / 0.9);
 
     --radius: 1rem;
   }
@@ -71,11 +71,12 @@
     font-family: 'Manrope', ui-sans-serif, system-ui, sans-serif;
     background: hsl(var(--background));
     background-image:
-      radial-gradient(ellipse 60% 40% at 50% 0%, hsl(244 76% 59% / 0.12), transparent 70%),
-      radial-gradient(circle at 10% 40%, hsl(244 76% 59% / 0.06), transparent 50%),
-      radial-gradient(circle at 90% 60%, hsl(240 50% 24% / 0.15), transparent 50%);
+      radial-gradient(ellipse 60% 40% at 50% 0%, hsl(158 72% 46% / 0.10), transparent 70%),
+      radial-gradient(circle at 10% 40%, hsl(42 88% 62% / 0.05), transparent 50%),
+      radial-gradient(circle at 90% 60%, hsl(160 14% 18% / 0.4), transparent 50%);
     background-attachment: fixed;
   }
+
 
   h1, h2, h3, h4, h5, h6, .font-display {
     font-family: 'Sora', ui-sans-serif, system-ui, sans-serif;
