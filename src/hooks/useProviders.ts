@@ -90,33 +90,37 @@ export const useProviderOffers = (turnover?: number) => {
   return useQuery({
     queryKey: ["provider-offers", turnover],
     queryFn: async () => {
-      let query = supabase
-        .from("provider_offers")
-        .select("*")
-        .eq("is_active", true)
-        .lte("start_date", new Date().toISOString())
-        .gte("end_date", new Date().toISOString())
-        .order("priority", { ascending: false });
+      try {
+        const { data, error } = await supabase
+          .from("provider_offers")
+          .select("*")
+          .eq("is_active", true)
+          .lte("start_date", new Date().toISOString())
+          .gte("end_date", new Date().toISOString())
+          .order("priority", { ascending: false });
 
-      const { data, error } = await query;
+        if (error) throw error;
 
-      if (error) throw error;
+        if (turnover) {
+          return (data as ProviderOffer[]).filter(offer => {
+            const meetsMin = offer.min_turnover === null || turnover >= offer.min_turnover;
+            const meetsMax = offer.max_turnover === null || turnover <= offer.max_turnover;
+            return meetsMin && meetsMax;
+          });
+        }
 
-      // Filter by turnover on the client side if provided
-      if (turnover) {
-        return (data as ProviderOffer[]).filter(offer => {
-          const meetsMin = offer.min_turnover === null || turnover >= offer.min_turnover;
-          const meetsMax = offer.max_turnover === null || turnover <= offer.max_turnover;
-          return meetsMin && meetsMax;
-        });
+        return data as ProviderOffer[];
+      } catch (err) {
+        console.warn("[useProviderOffers] Backend unavailable, returning empty offers");
+        return [] as ProviderOffer[];
       }
-
-      return data as ProviderOffer[];
     },
     enabled: turnover !== undefined,
-    staleTime: 2 * 60 * 1000, // Cache for 2 minutes (offers might change)
+    retry: false,
+    staleTime: 2 * 60 * 1000,
   });
 };
+
 
 export const usePriorityRules = (turnover: number) => {
   return useQuery({
