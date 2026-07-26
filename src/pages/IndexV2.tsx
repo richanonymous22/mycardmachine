@@ -134,14 +134,14 @@ const IndexV2 = () => {
                     Monthly Card Turnover
                   </Label>
                   <div className="relative flex items-center">
-                    <span className="absolute left-0 font-display text-4xl md:text-5xl font-bold text-primary/80/30">£</span>
+                    <span className="absolute left-0 font-display text-4xl md:text-5xl font-bold text-primary/40">£</span>
                     <Input
                       id="turnover-v2"
                       type="text"
                       value={turnover && turnover > 0 ? turnover.toLocaleString() : ""}
                       onChange={(e) => handleTurnoverChange(e.target.value)}
                       placeholder="15,000"
-                      className="font-display h-auto w-full bg-transparent border-0 border-b-2 border-border rounded-none pb-3 pl-10 text-4xl md:text-5xl font-bold text-white focus-visible:ring-0 focus-visible:border-primary focus-visible:outline-none transition-colors"
+                      className="font-display h-auto w-full bg-transparent border-0 border-b-2 border-border rounded-none pb-3 pl-10 text-4xl md:text-5xl font-bold text-foreground focus-visible:ring-0 focus-visible:border-primary focus-visible:outline-none transition-colors"
                     />
                   </div>
                   <p className="text-xs text-muted-foreground mt-4">
