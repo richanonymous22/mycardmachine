@@ -99,7 +99,7 @@ const IndexV2 = () => {
         </div>
       )}
 
-      <section id="calculator-section" className="relative py-24 md:py-32 px-6 bg-[hsl(240_45%_7%)] border-y border-border/50">
+      <section id="calculator-section" className="relative py-24 md:py-32 px-6 bg-secondary/40 border-y border-border/50">
         <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_top,hsl(var(--primary)/0.08),transparent_60%)]" />
         <div className="max-w-7xl mx-auto relative">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
