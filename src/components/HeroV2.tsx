@@ -91,7 +91,7 @@ export const HeroV2 = () => {
             { value: "4.9/5", label: "Merchant Rating" },
           ].map((s) => (
             <div key={s.label} className="text-center">
-              <div className="font-display text-2xl md:text-4xl font-extrabold text-white mb-1">
+              <div className="font-display text-2xl md:text-4xl font-extrabold text-foreground mb-1">
                 {s.value}
               </div>
               <div className="text-[11px] md:text-xs uppercase tracking-widest text-muted-foreground">
