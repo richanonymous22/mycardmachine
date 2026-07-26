@@ -34,10 +34,10 @@ export const HeroV2 = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.05 }}
-          className="font-display text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-extrabold tracking-tighter leading-[0.9] mb-10 uppercase"
+          className="font-display text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-extrabold tracking-tighter leading-[0.9] mb-10 uppercase text-foreground"
         >
           Stop{" "}
-          <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-primary">
+          <span className="text-transparent bg-clip-text bg-gradient-to-b from-foreground to-primary">
             Overpaying
           </span>
           <br />
