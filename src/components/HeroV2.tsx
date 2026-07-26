@@ -63,7 +63,7 @@ export const HeroV2 = () => {
           <Button
             size="lg"
             onClick={scrollToCalculator}
-            className="w-full sm:w-auto px-10 py-7 bg-primary hover:bg-primary/90 text-white rounded-full font-bold text-lg shadow-[0_0_40px_-10px_hsl(var(--primary)/0.6)] hover:shadow-[0_0_60px_-10px_hsl(var(--primary)/0.9)] transition-all group"
+            className="w-full sm:w-auto px-10 py-7 bg-primary hover:bg-primary-hover text-primary-foreground rounded-full font-bold text-lg shadow-[0_0_40px_-10px_hsl(var(--primary)/0.6)] hover:shadow-[0_0_60px_-10px_hsl(var(--primary)/0.9)] transition-all group"
           >
             Compare Machines
             <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
@@ -72,7 +72,7 @@ export const HeroV2 = () => {
             size="lg"
             variant="outline"
             onClick={scrollToProviders}
-            className="w-full sm:w-auto px-10 py-7 bg-card border border-border hover:bg-secondary-hover text-white rounded-full font-bold text-lg"
+            className="w-full sm:w-auto px-10 py-7 bg-card border border-border hover:bg-secondary-hover text-foreground rounded-full font-bold text-lg"
           >
             View Providers
           </Button>
