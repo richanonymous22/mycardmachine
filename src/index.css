@@ -6,56 +6,56 @@
 
 @layer base {
   :root {
-    /* Warm Charcoal + Emerald — sophisticated, not blue */
-    --background: 160 12% 6%;               /* near-black with faint green */
-    --foreground: 40 20% 96%;               /* warm off-white */
+    /* Navy Trust — finance-grade, dependable */
+    --background: 224 61% 11%;              /* deep navy #0f1b3d */
+    --foreground: 217 27% 93%;              /* crisp off-white #e8edf3 */
 
-    --card: 160 10% 10%;
-    --card-foreground: 40 20% 96%;
-    --card-border: 160 14% 18%;
+    --card: 213 52% 18%;
+    --card-foreground: 217 27% 93%;
+    --card-border: 213 40% 28%;
 
-    --primary: 158 72% 46%;                 /* emerald */
-    --primary-foreground: 160 30% 8%;
-    --primary-muted: 158 72% 46% / 0.12;
-    --primary-hover: 158 72% 40%;
-    --primary-glow: 158 72% 55% / 0.45;
+    --primary: 209 46% 43%;                 /* steel blue #3b6fa0 */
+    --primary-foreground: 217 27% 96%;
+    --primary-muted: 209 46% 43% / 0.14;
+    --primary-hover: 209 50% 50%;
+    --primary-glow: 209 60% 60% / 0.45;
 
-    --secondary: 160 10% 12%;
-    --secondary-foreground: 40 20% 96%;
-    --secondary-hover: 160 12% 16%;
+    --secondary: 213 52% 16%;
+    --secondary-foreground: 217 27% 93%;
+    --secondary-hover: 213 45% 22%;
 
-    --accent: 42 88% 62%;                   /* warm amber for highlights */
-    --accent-foreground: 160 30% 8%;
-    --accent-muted: 42 88% 62% / 0.12;
-    --accent-hover: 42 88% 55%;
+    --accent: 217 27% 93%;                  /* light foreground accent */
+    --accent-foreground: 224 61% 11%;
+    --accent-muted: 217 27% 93% / 0.10;
+    --accent-hover: 217 27% 88%;
 
-    --muted: 160 10% 12%;
-    --muted-foreground: 160 10% 62%;
-    --border: 160 14% 18%;
-    --input: 160 10% 14%;
-    --ring: 158 72% 46%;
+    --muted: 213 40% 18%;
+    --muted-foreground: 215 25% 68%;
+    --border: 213 40% 22%;
+    --input: 213 40% 18%;
+    --ring: 209 46% 43%;
 
-    --success: 158 72% 46%;
-    --success-foreground: 160 30% 8%;
+    --success: 158 64% 46%;
+    --success-foreground: 224 61% 11%;
     --warning: 38 92% 55%;
-    --warning-foreground: 160 30% 8%;
+    --warning-foreground: 224 61% 11%;
     --destructive: 0 73% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --popover: 160 12% 8%;
-    --popover-foreground: 40 20% 96%;
+    --popover: 224 55% 13%;
+    --popover-foreground: 217 27% 93%;
 
-    --gradient-primary: linear-gradient(135deg, hsl(158 72% 46%), hsl(170 72% 55%));
-    --gradient-secondary: linear-gradient(135deg, hsl(160 10% 10%), hsl(160 14% 16%));
-    --gradient-accent: linear-gradient(180deg, hsl(42 88% 62%), hsl(158 72% 46%));
-    --gradient-background: radial-gradient(ellipse 80% 50% at 50% -20%, hsl(158 72% 46% / 0.18), transparent);
+    --gradient-primary: linear-gradient(135deg, hsl(209 46% 43%), hsl(213 60% 55%));
+    --gradient-secondary: linear-gradient(135deg, hsl(213 52% 18%), hsl(213 45% 25%));
+    --gradient-accent: linear-gradient(180deg, hsl(209 46% 55%), hsl(213 52% 25%));
+    --gradient-background: radial-gradient(ellipse 80% 50% at 50% -20%, hsl(209 46% 43% / 0.22), transparent);
 
-    --shadow-sm: 0 1px 2px 0 hsl(160 30% 2% / 0.5);
-    --shadow-md: 0 4px 6px -1px hsl(160 30% 2% / 0.5);
-    --shadow-lg: 0 10px 25px -3px hsl(160 30% 2% / 0.6);
-    --shadow-xl: 0 25px 50px -12px hsl(160 30% 2% / 0.7);
-    --shadow-glow: 0 0 40px -10px hsl(158 72% 46% / 0.5);
-    --shadow-premium: 0 25px 50px -12px hsl(160 30% 2% / 0.9);
+    --shadow-sm: 0 1px 2px 0 hsl(224 60% 4% / 0.5);
+    --shadow-md: 0 4px 6px -1px hsl(224 60% 4% / 0.5);
+    --shadow-lg: 0 10px 25px -3px hsl(224 60% 4% / 0.6);
+    --shadow-xl: 0 25px 50px -12px hsl(224 60% 4% / 0.7);
+    --shadow-glow: 0 0 40px -10px hsl(209 60% 55% / 0.5);
+    --shadow-premium: 0 25px 50px -12px hsl(224 60% 4% / 0.9);
 
     --radius: 1rem;
   }
@@ -71,9 +71,9 @@
     font-family: 'Manrope', ui-sans-serif, system-ui, sans-serif;
     background: hsl(var(--background));
     background-image:
-      radial-gradient(ellipse 60% 40% at 50% 0%, hsl(158 72% 46% / 0.10), transparent 70%),
-      radial-gradient(circle at 10% 40%, hsl(42 88% 62% / 0.05), transparent 50%),
-      radial-gradient(circle at 90% 60%, hsl(160 14% 18% / 0.4), transparent 50%);
+      radial-gradient(ellipse 60% 40% at 50% 0%, hsl(209 46% 43% / 0.14), transparent 70%),
+      radial-gradient(circle at 10% 40%, hsl(213 60% 55% / 0.06), transparent 50%),
+      radial-gradient(circle at 90% 60%, hsl(213 40% 28% / 0.4), transparent 50%);
     background-attachment: fixed;
   }
 

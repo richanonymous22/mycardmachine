@@ -34,10 +34,10 @@ export const HeroV2 = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.05 }}
-          className="font-display text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-extrabold tracking-tighter leading-[0.9] mb-10 uppercase"
+          className="font-display text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-extrabold tracking-tighter leading-[0.9] mb-10 uppercase text-foreground"
         >
           Stop{" "}
-          <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-primary">
+          <span className="text-transparent bg-clip-text bg-gradient-to-b from-foreground to-primary">
             Overpaying
           </span>
           <br />
@@ -63,7 +63,7 @@ export const HeroV2 = () => {
           <Button
             size="lg"
             onClick={scrollToCalculator}
-            className="w-full sm:w-auto px-10 py-7 bg-primary hover:bg-primary/90 text-white rounded-full font-bold text-lg shadow-[0_0_40px_-10px_hsl(var(--primary)/0.6)] hover:shadow-[0_0_60px_-10px_hsl(var(--primary)/0.9)] transition-all group"
+            className="w-full sm:w-auto px-10 py-7 bg-primary hover:bg-primary-hover text-primary-foreground rounded-full font-bold text-lg shadow-[0_0_40px_-10px_hsl(var(--primary)/0.6)] hover:shadow-[0_0_60px_-10px_hsl(var(--primary)/0.9)] transition-all group"
           >
             Compare Machines
             <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
@@ -72,7 +72,7 @@ export const HeroV2 = () => {
             size="lg"
             variant="outline"
             onClick={scrollToProviders}
-            className="w-full sm:w-auto px-10 py-7 bg-card border border-border hover:bg-secondary-hover text-white rounded-full font-bold text-lg"
+            className="w-full sm:w-auto px-10 py-7 bg-card border border-border hover:bg-secondary-hover text-foreground rounded-full font-bold text-lg"
           >
             View Providers
           </Button>
@@ -91,7 +91,7 @@ export const HeroV2 = () => {
             { value: "4.9/5", label: "Merchant Rating" },
           ].map((s) => (
             <div key={s.label} className="text-center">
-              <div className="font-display text-2xl md:text-4xl font-extrabold text-white mb-1">
+              <div className="font-display text-2xl md:text-4xl font-extrabold text-foreground mb-1">
                 {s.value}
               </div>
               <div className="text-[11px] md:text-xs uppercase tracking-widest text-muted-foreground">

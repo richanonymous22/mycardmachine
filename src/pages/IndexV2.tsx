@@ -99,7 +99,7 @@ const IndexV2 = () => {
         </div>
       )}
 
-      <section id="calculator-section" className="relative py-24 md:py-32 px-6 bg-[hsl(240_45%_7%)] border-y border-border/50">
+      <section id="calculator-section" className="relative py-24 md:py-32 px-6 bg-secondary/40 border-y border-border/50">
         <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_top,hsl(var(--primary)/0.08),transparent_60%)]" />
         <div className="max-w-7xl mx-auto relative">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
@@ -134,14 +134,14 @@ const IndexV2 = () => {
                     Monthly Card Turnover
                   </Label>
                   <div className="relative flex items-center">
-                    <span className="absolute left-0 font-display text-4xl md:text-5xl font-bold text-primary/80/30">£</span>
+                    <span className="absolute left-0 font-display text-4xl md:text-5xl font-bold text-primary/40">£</span>
                     <Input
                       id="turnover-v2"
                       type="text"
                       value={turnover && turnover > 0 ? turnover.toLocaleString() : ""}
                       onChange={(e) => handleTurnoverChange(e.target.value)}
                       placeholder="15,000"
-                      className="font-display h-auto w-full bg-transparent border-0 border-b-2 border-border rounded-none pb-3 pl-10 text-4xl md:text-5xl font-bold text-white focus-visible:ring-0 focus-visible:border-primary focus-visible:outline-none transition-colors"
+                      className="font-display h-auto w-full bg-transparent border-0 border-b-2 border-border rounded-none pb-3 pl-10 text-4xl md:text-5xl font-bold text-foreground focus-visible:ring-0 focus-visible:border-primary focus-visible:outline-none transition-colors"
                     />
                   </div>
                   <p className="text-xs text-muted-foreground mt-4">
